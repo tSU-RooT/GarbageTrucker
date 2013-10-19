@@ -6,25 +6,24 @@ function Unit_Sprite(width, height){
 	Sprite.apply(this, [width, height])
 	this.r = 0;
 	this.theta = 0;
-	this.time = 0;
-	update: function() {
+	this.timer = 0;
+	/*update: function() {
 		this.time += 1;
-	}
+	}*/
+	
 }
 Unit_Sprite.prototype = new Sprite();
-
-
 Unit_Sprite.constructor = Unit_Sprite;
-
+var _input = 0;
 function pressSpaceKey() {
-	return false;
+	return game.input.a == 1;
 }
 
 var game;
 window.onload = function() {
     game = new Game(320, 320);
     game.preload('img/unit_24.png');
-    game.preload('img/stage_01.png');
+    game.preload('img/stage.png');
     game.preload('img/background.png');
     game.preload('img/title.png');
     game.fps = 15;
@@ -35,24 +34,28 @@ window.onload = function() {
     	game.rootScene.addChild(background_sprite);
     	
     	var stage_sprite = new Sprite(320, 320);
-    	stage_sprite.image = game.assets['img/stage_01.png'];
+    	stage_sprite.image = game.assets['img/stage.png'];
+    	stage_sprite.timer = 0;
     	game.rootScene.addChild(stage_sprite);
+    	stage_sprite.onenterframe = function() {
+    		if (pressSpaceKey()) {
+    			this.timer += 1;
+    		} else if (this.timer > 0) {
+    			this.timer -= 1;
+    		}
+    		this.frame = this.timer % 7;
+    	};
     	var unit_sprite = new Unit_Sprite(24, 24);
     	unit_sprite.image = game.assets['img/unit_24.png'];
     	unit_sprite.rotate(45);
     	unit_sprite.r = 240;
-    	unit_sprite.theta = 135 + 90;//180 + 135;
+    	unit_sprite.theta = 135 + 90;
     	game.rootScene.addChild(unit_sprite);
-    	//unit_sprite.scale(0.75, 0.75);
     	var each_frame_event = function() {
     		background_sprite.x -= 1;
     		background_sprite.y -= 2;
     		if (unit_sprite.r > 72) {
     			unit_sprite.r -= 4;
-
-    			/*if (unit_sprite.r == 60) {
-    				unit_sprite.rotation = -45;
-    			}*/
     		} else {
     			unit_sprite.theta -= 3;
     			unit_sprite.rotation = 180 - unit_sprite.theta;
@@ -62,6 +65,20 @@ window.onload = function() {
     		unit_sprite.y = 160 - 12 - Math.sin(unit_sprite.theta * Math.PI / 180.0) * unit_sprite.r;
     	}
     	game.rootScene.addEventListener('enterframe', each_frame_event);
-    }
+    	
+    	var input_function = function(e) {
+    		console.log(e);
+    		switch(e.type) {
+              case Event.A_BUTTON_DOWN:
+                _input = 1;
+                break;
+              case Event.A_BUTTON_DOWN:
+                _input = 0;
+                break;
+            }
+    	};
+    	game.rootScene.addEventListener(Event.UP_BUTTON_UP, input_function);
+    	game.rootScene.addEventListener(Event.A_BUTTON_DOWN, input_function);
+    };
     game.start();
 }
