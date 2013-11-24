@@ -156,7 +156,7 @@ Rocket_Sprite.constructor = Rocket_Sprite;
 
 var _input = 0;
 function pressSpaceKey() {
-	return game.input.up == 1;
+	return game.input.a == 1;
 }
 function rand(max) {
 	return Math.floor(Math.random() * max);
@@ -167,6 +167,7 @@ var game;
 
 window.onload = function() {
     game = new Game(320, 320);
+    game.keybind(32, 'a');
     game.preload('img/units.png');
     game.preload('img/stage.png');
     game.preload('img/rockets.png');
@@ -175,19 +176,30 @@ window.onload = function() {
     game.fps = 15;
     game.scale = 4;
     var plus_se = Sound.load('sounds/button09.mp3'); 
-    /*var game_titlescene_process = function() {
-    	game.popScene();
-    	game.pushScene(new Scene());
+    var game_titlescene_process = function() {
+    	//game.popScene();
+    	//game.pushScene(new Scene());
     	var title_sprite = new Sprite(320, 320);
     	title_sprite.image = game.assets['img/title.png'];
     	title_sprite.opacity = 0;
-    	title_sprite.tl.fadeIn(30);
+    	title_sprite.tl.fadeIn(35);
     	game.rootScene.addChild(title_sprite);
-    };*/
-    game.onload = function() {
+    	var clicked = false;
+    	title_sprite.addEventListener('touchstart', function() {clicked = true;});
+    	game.rootScene.addEventListener('enterframe', function() {
+    		if (pressSpaceKey() || clicked) {
+    			//game.popScene();
+    			game.pushScene(new Scene());
+    			game_main_process();
+    		}
+    	});
+
+    };
+    
+    var game_main_process = function() {
     	// メイン画面の処理
-    	game.popScene();
-    	game.pushScene(new Scene());
+    	//game.popScene();
+    	//game.pushScene(new Scene());
     	var background_sprite = new Sprite(640, 640);
     	background_sprite.image = game.assets['img/background.png'];
     	background_sprite.speed_x = -1;
@@ -341,5 +353,7 @@ window.onload = function() {
     		return !collision;
     	}
     };
+    game.onload = game_titlescene_process;
+    //game.onload = game_main_process;
     game.start();
 }
