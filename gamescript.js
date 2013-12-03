@@ -22,15 +22,24 @@ function Unit_Sprite(color_id){
 		if (this.trans) {
 			return;
 		}
-		if (this.timer < 42) {
-			this.r -= 4;
-		} else if (this.timer >= 42 && this.timer < 47) {
-			this.rotate(-18);
+		if (this.timer < 42 * 2) {
+			this.r -= 2;
+		} else if (this.timer >= 42 * 2 && this.timer < (42 * 2) + 10) {
+			this.rotate(-9);
 		} else if (this.shift) {
-			if (this.shift <= 3) {
-				this.rotate(-30);
+			if (this.shift == 1) {
+				var foo = (this.theta - 45);
+				if (foo < 0) {
+					foo += 360;
+				}
+				foo %= 90;
+				this.theta -= foo / 2;
+				console.log("unit.r:"+this.r);
+			}
+			if (this.shift <= 9) {
+				this.rotate(-10);
 			} else {
-				this.r += 5;
+				this.r += 3;
 			}
 			if (this.r >= 196) {
 				this.trans = true;
@@ -89,13 +98,13 @@ function Unit_Sprite(color_id){
 		if (arguments[0]) {
 			rev = arguments[0];
 		}
-		if (!this.shift && (this.timer > 47)) {
+		if (!this.shift && (this.timer > 47 * 2)) {
 			var foo = (this.theta + rev - 45);
 			if (foo < 0) {
 				foo += 360;
 			}
 			foo %= 90;
-			if (foo <= UNIT_SPEED_ON_STAGE * 2) {
+			if (foo <= UNIT_SPEED_ON_STAGE * 4) {
 				return true;
 			}
 		}
@@ -115,6 +124,7 @@ function Rocket_Sprite(di_i, color_i) {
 	this.direction_id = di_i;
 	this.color_id = color_i;
 	this.opacity = 0.75;
+	this.fade = false;
 	this.frame = (color_i - 1) * 10;
 	if (di_i<= 0 || di_i > 4) {
 		throw new Error("direction_idの指定が不正です。", "gamescript.js", 57);
@@ -141,12 +151,14 @@ function Rocket_Sprite(di_i, color_i) {
 			break;
 	}
 	this.onenterframe = function() {
+		if (this.fade) {
+			return;
+		}
 		if (this.color_id > 0) {
 			this.opacity = 0.75;
 		} else {
 			this.opacity = 0;
 		}
-		//this.opacity = this.capacity * 0.1;
 		this.frame = (this.color_id - 1) * 10 + this.capacity;
 	}
 }
@@ -172,10 +184,16 @@ window.onload = function() {
     game.preload('img/stage.png');
     game.preload('img/rockets.png');
     game.preload('img/background.png');
-    game.preload('img/title.png');
-    game.fps = 15;
+    game.preload('img/moon.png');
+    game.preload('img/earth_.png');
+    game.preload('img/window.png');
+    game.preload('img/rocket_mini.png');
+    //game.preload('img/title.png');
+    game.fps = 15 * 2;
     game.scale = 4;
     var plus_se = Sound.load('sounds/button09.mp3'); 
+    var fire_se = Sound.load('sounds/fire02.mp3');
+    var plus2_se = Sound.load('sounds/decide4.wav'); 
     var game_titlescene_process = function() {
     	//game.popScene();
     	//game.pushScene(new Scene());
@@ -189,8 +207,10 @@ window.onload = function() {
     	game.rootScene.addEventListener('enterframe', function() {
     		if (pressSpaceKey() || clicked) {
     			//game.popScene();
-    			game.pushScene(new Scene());
-    			game_main_process();
+    			//game.replaceScene(new Scene());
+    			game.onload = game_main_process;
+    			title_sprite.opacity = 0;
+    			game.onload();
     		}
     	});
 
@@ -252,26 +272,36 @@ window.onload = function() {
     	var main_timer = 1;
     	var game_barance_tempo = 0;
     	var units = new Array();
+    	var unit_count = 1;
+    	var call_trashscene = 0;
     	addUnit(3, 1);
     	var each_frame_event = function() {
     		// メイン処理
+    		// ユニットの更新処理と破棄
     		for(var i = 0;i<units.length;i++) {
     			if (units[i].can_dispose >= 1) {
     				addPoint(units[i].can_dispose, units[i].color_id);
     				units[i].tl.removeFromScene();
     				units.splice(i, 1);
     				i--;
-    				plus_se.play();
+    				
     				continue;
     			}
     			units[i].update();
     			if (pressSpaceKey() && units[i].canShift()) {
     					units[i].shift = 1;
     			}
-    			if (units[i].trans) {
-    				//units[i] = null;
-    			}
+    			
     		}
+    		// 数フレームごとにユニットを追加する
+    		/*
+    		  メモ:1unitは360度で当然一回転
+    		  1frameあたり2度動くので180フレームで一回転
+    		  さらに現在30FPSの設定なので6秒で一周する
+
+    		  45度動くたびに判定を行いたい
+    		  23,45
+    		*/
     		if (main_timer % 22.5 <= 0.5) {
     			if (canInsertUnit()) {
     				/*if (rand(6) == 0) {
@@ -286,8 +316,11 @@ window.onload = function() {
 						さらに1目標達成後4色目とする。
 						----------------------------
     				*/
-    				if (game_barance_tempo == 0) {
-
+    				if (game_barance_tempo == 0 && rand(2) == 1) {
+    					addUnit(rand(4) + 1, 1);
+    					if (unit_count <= 5){
+    						
+    					}
     				} else {
 
     				}
@@ -296,6 +329,16 @@ window.onload = function() {
 
     			}
     		}
+    		// 別画面の呼び出しがある場合、指定フレーム後に呼び出す		
+    		if (call_trashscene > 0) {
+    				call_trashscene--;
+    				if (call_trashscene == 0) {
+    					showTrashScene();
+
+    				}
+    			
+    		}
+    		// メインタイマーの加算
     		main_timer += 1;
 
     	}
@@ -311,20 +354,56 @@ window.onload = function() {
     		unit_sprite.setPolarToXY();
     		game.rootScene.addChild(unit_sprite);
     		units.push(unit_sprite);
+    		unit_count++;
     	}
     	function addPoint(dir, color_id) {
     		if (rockets[dir].color_id == 0) {
     			rockets[dir].color_id = color_id;
     			rockets[dir].capacity = 1;
+    			plus_se.play();
     		} else {
     			if (rockets[dir].color_id == color_id) {
     				rockets[dir].capacity += 1;
+    				if (rockets[dir].capacity >= 2) { //10
+    					plus2_se.play();
+    					call_trashscene = 25;
+    					rockets[dir].fade = true;
+    					rockets[dir].tl.scaleTo(0.1, 10, 8).and().fadeOut(10);
+    					///showTrashScene();
+    				} else {
+    					plus_se.play();
+    				}
     			}
+    			
     		}
 
     	}
+    	function showTrashScene(color_id) {
+    		game.pushScene(new Scene());
+    		var sprite1 = new Sprite(220, 220);
+    		var sprite2 = new Sprite(220, 220);
+    		var sprite3 = new Sprite(220, 220);
+    		sprite1.x = sprite2.x = sprite3.x = 50;
+    		sprite1.y = sprite2.y = sprite3.y = 50;
+    		sprite1.opacity = sprite2.opacity = sprite3.opacity = 0;
+    		var mini_rocket_sprite = new Sprite(16, 24);
+    		mini_rocket_sprite.opacity = 0;
+    		sprite1.image = game.assets['img/window.png'];
+    		sprite2.image = game.assets['img/earth_.png'];
+    		sprite3.image = game.assets['img/moon.png'];
+    		mini_rocket_sprite.image = game.assets['img/rocket_mini.png'];
+    		game.currentScene.addChild(sprite1);
+    		game.currentScene.addChild(mini_rocket_sprite);
+    		game.currentScene.addChild(sprite2);
+    		game.currentScene.addChild(sprite3);
+    		sprite1.tl.fadeIn(12);
+    		sprite2.tl.fadeIn(12);
+    		sprite3.tl.fadeIn(12);
+    		//sprite.onenterframe = function() {
+    		
+    	}
     	function canInsertUnit() {
-    		if (units.length > 60) {
+    		if (units.length > 8) {
     			return false;
     		}
     		var collision = false;
@@ -353,7 +432,7 @@ window.onload = function() {
     		return !collision;
     	}
     };
-    game.onload = game_titlescene_process;
-    //game.onload = game_main_process;
+    //game.onload = game_titlescene_process;
+    game.onload = game_main_process;
     game.start();
 }
