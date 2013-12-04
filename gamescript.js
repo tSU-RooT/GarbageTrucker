@@ -34,7 +34,6 @@ function Unit_Sprite(color_id){
 				}
 				foo %= 90;
 				this.theta -= foo / 2;
-				console.log("unit.r:"+this.r);
 			}
 			if (this.shift <= 9) {
 				this.rotate(-10);
@@ -190,11 +189,14 @@ window.onload = function() {
     game.preload('img/rocket_mini.png');
     //game.preload('img/title.png');
     game.fps = 15 * 2;
-    game.scale = 4;
-    var plus_se = Sound.load('sounds/button09.mp3'); 
+    game.scale = 6;
+    var bgm = Sound.load('sounds/bgm.mp3');
+    var plus_se = Sound.load('sounds/button09.mp3');
     var fire_se = Sound.load('sounds/fire02.mp3');
-    var plus2_se = Sound.load('sounds/decide4.wav'); 
+    var plus2_se = Sound.load('sounds/decide4.wav');
+    console.log(plus_se);
     var game_titlescene_process = function() {
+
     	//game.popScene();
     	//game.pushScene(new Scene());
     	var title_sprite = new Sprite(320, 320);
@@ -218,8 +220,7 @@ window.onload = function() {
     
     var game_main_process = function() {
     	// メイン画面の処理
-    	//game.popScene();
-    	//game.pushScene(new Scene());
+    	// 
     	var background_sprite = new Sprite(640, 640);
     	background_sprite.image = game.assets['img/background.png'];
     	background_sprite.speed_x = -1;
@@ -334,13 +335,15 @@ window.onload = function() {
     				call_trashscene--;
     				if (call_trashscene == 0) {
     					showTrashScene();
-
     				}
     			
     		}
+    		// BGM 2秒目に演奏を開始する。
+    		if (main_timer == game.fps * 2) {
+    			bgm.play();
+    		}
     		// メインタイマーの加算
     		main_timer += 1;
-
     	}
     	game.rootScene.addEventListener('enterframe', each_frame_event);
     	
@@ -369,7 +372,6 @@ window.onload = function() {
     					call_trashscene = 25;
     					rockets[dir].fade = true;
     					rockets[dir].tl.scaleTo(0.1, 10, 8).and().fadeOut(10);
-    					///showTrashScene();
     				} else {
     					plus_se.play();
     				}
@@ -399,8 +401,21 @@ window.onload = function() {
     		sprite1.tl.fadeIn(12);
     		sprite2.tl.fadeIn(12);
     		sprite3.tl.fadeIn(12);
-    		//sprite.onenterframe = function() {
-    		
+    		var sub_timer = 1;
+    		game.currentScene.addEventListener('enterframe', function() {
+    			if (sub_timer == 35) {
+    				mini_rocket_sprite.opacity = 1;
+    				mini_rocket_sprite.x = 50 - 8;
+    				mini_rocket_sprite.y = 320 - 50 - 24 - 10;
+    				fire_se.play();
+    			}
+    			if (sub_timer > 35 && sub_timer <= 35 + 45) {
+    				var t = sub_timer - 35;
+    				mini_rocket_sprite.y -= (-0.002821 * t * t) + (0.129806 * t);
+    			}
+
+    			sub_timer++;
+    		});
     	}
     	function canInsertUnit() {
     		if (units.length > 8) {
@@ -435,4 +450,5 @@ window.onload = function() {
     //game.onload = game_titlescene_process;
     game.onload = game_main_process;
     game.start();
+
 }
