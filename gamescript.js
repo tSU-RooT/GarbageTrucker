@@ -187,14 +187,14 @@ window.onload = function() {
     game.preload('img/earth_.png');
     game.preload('img/window.png');
     game.preload('img/rocket_mini.png');
-    //game.preload('img/title.png');
+    game.preload('img/garbage.png');
     game.fps = 15 * 2;
     game.scale = 6;
     var bgm = Sound.load('sounds/bgm.mp3');
     var plus_se = Sound.load('sounds/button09.mp3');
     var fire_se = Sound.load('sounds/fire02.mp3');
     var plus2_se = Sound.load('sounds/decide4.wav');
-    console.log(plus_se);
+    var garbage_se = Sound.load('sounds/beep11.wav');
     var game_titlescene_process = function() {
 
     	//game.popScene();
@@ -405,13 +405,41 @@ window.onload = function() {
     		game.currentScene.addEventListener('enterframe', function() {
     			if (sub_timer == 35) {
     				mini_rocket_sprite.opacity = 1;
-    				mini_rocket_sprite.x = 50 - 8;
-    				mini_rocket_sprite.y = 320 - 50 - 24 - 10;
+    				mini_rocket_sprite.x = 160 - 8;
+    				mini_rocket_sprite.y = 50 + 144
     				fire_se.play();
     			}
     			if (sub_timer > 35 && sub_timer <= 35 + 45) {
     				var t = sub_timer - 35;
-    				mini_rocket_sprite.y -= (-0.002821 * t * t) + (0.129806 * t);
+    				mini_rocket_sprite.y -= (-0.0074074 * t * t) + (0.3407407 * t);
+    				// 46フレームで120pixel上に動かす
+    				// ∫(-ax^2 + bx)dx = 120 → a = 0.0074074
+    				// f'(x) = -2ax + b && f'(23) = 0 → b = 46a
+    			} else if (sub_timer == 100) {
+    				/*
+    				  g1:(96, 18)
+    				  g2:(118, 25)
+    				  g3:(109, 41)
+    				*/
+    				var garbage1 = new Sprite(8, 8);
+    				var garbage2 = new Sprite(8, 8);
+    				var garbage3 = new Sprite(8, 8);
+    				garbage1.image = game.assets['img/garbage.png'];
+    				garbage2.image = game.assets['img/garbage.png'];
+    				garbage3.image = game.assets['img/garbage.png'];
+    				garbage1.opacity = garbage2.opacity = garbage3.opacity = 0;
+    				
+    				garbage1.moveTo(96 + 50, 18 + 50);
+    				garbage2.moveTo(118 + 50, 25 + 50);
+    				garbage3.moveTo(109 + 50, 41 + 50);
+    				game.currentScene.addChild(garbage1);
+    				game.currentScene.addChild(garbage2);
+    				game.currentScene.addChild(garbage3);
+    				garbage_se.play();
+    				garbage1.tl.fadeIn(20);
+    				garbage2.tl.delay(5).fadeIn(20);
+    				garbage3.tl.delay(10).fadeIn(20);
+
     			}
 
     			sub_timer++;
