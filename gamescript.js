@@ -153,18 +153,22 @@ function Rocket_Sprite(di_i, color_i) {
 		if (this.fade) {
 			return;
 		}
+
+		this.frame = (this.color_id - 1) * 10 + this.capacity;
+		
 		if (this.color_id > 0) {
 			this.opacity = 0.75;
 		} else {
 			this.opacity = 0;
 		}
-		this.frame = (this.color_id - 1) * 10 + this.capacity;
 	}
 }
 Rocket_Sprite.prototype = new Sprite();
 Rocket_Sprite.constructor = Rocket_Sprite;
 
 
+
+// クラス定義終わり
 var _input = 0;
 function pressSpaceKey() {
 	return game.input.a == 1;
@@ -188,11 +192,14 @@ window.onload = function() {
     game.preload('img/window.png');
     game.preload('img/rocket_mini.png');
     game.preload('img/garbage.png');
+    game.preload('img/explode.png');
+    game.preload('img/num_char.png');
     game.fps = 15 * 2;
     game.scale = 6;
     var bgm = Sound.load('sounds/bgm.mp3');
     var plus_se = Sound.load('sounds/button09.mp3');
-    var fire_se = Sound.load('sounds/fire02.mp3');
+    var fire_se = Sound.load('sounds/fire01.wav');
+    var fire2_se = Sound.load('sounds/fire02.mp3');
     var plus2_se = Sound.load('sounds/decide4.wav');
     var garbage_se = Sound.load('sounds/beep11.wav');
     var game_titlescene_process = function() {
@@ -220,7 +227,7 @@ window.onload = function() {
     
     var game_main_process = function() {
     	// メイン画面の処理
-    	// 
+    	// バックグラウンド
     	var background_sprite = new Sprite(640, 640);
     	background_sprite.image = game.assets['img/background.png'];
     	background_sprite.speed_x = -1;
@@ -233,18 +240,18 @@ window.onload = function() {
     		}
     		if (this.x >= 0) {
     			this.speed_x *= -1;
-    			this.speed_x -= 1;
+    			this.speed_x -= 0.25;
     		}
     		if (this.y <= -320) {
     			this.speed_y *= -1;
     		}
     		if (this.y >= 0) {
     			this.speed_y *= -1;
-    			this.speed_y -= 1;
+    			this.speed_y -= 0.25;
     		}
     	};
     	game.rootScene.addChild(background_sprite);
-    	
+    	// ステージ
     	var stage_sprite = new Sprite(320, 320);
     	stage_sprite.image = game.assets['img/stage.png'];
     	stage_sprite.timer = 0;
@@ -262,6 +269,19 @@ window.onload = function() {
     		}
     	};
     	game.rootScene.addChild(stage_sprite);
+
+    	// GameTimer(7進数)
+    	var gametimer_sprites = new Array(3);
+    	for (var i = 0;i<3;i++) {
+    		gametimer_sprites[i] = new Sprite(16, 16);
+    		gametimer_sprites[i].image = game.assets["img/num_char.png"];
+    		gametimer_sprites[i].frame = rand(7);
+    		gametimer_sprites[i].x = 160 - 8 - 16 + 17 * i
+    		gametimer_sprites[i].y = 160 - 8;
+    		game.rootScene.addChild(gametimer_sprites[i]);
+    	}
+    	var gamelimit_timer = 342;
+    	// -----------------------------------------------------------------------
     	// 初期化
     	var rockets = new Array();
 		for(var i = 1;i<=4;i++) {
@@ -371,6 +391,10 @@ window.onload = function() {
     					plus2_se.play();
     					call_trashscene = 25;
     					rockets[dir].fade = true;
+    					rockets[dir].frame += 1;
+    					// reset
+    					rockets[dir].capacity = 0;
+    					rockets[dir].color_id = 0;
     					rockets[dir].tl.scaleTo(0.1, 10, 8).and().fadeOut(10);
     				} else {
     					plus_se.play();
@@ -402,6 +426,10 @@ window.onload = function() {
     		sprite2.tl.fadeIn(12);
     		sprite3.tl.fadeIn(12);
     		var sub_timer = 1;
+    		var explode;
+    		var garbage1;
+    		var garbage2;
+    		var garbage3;
     		game.currentScene.addEventListener('enterframe', function() {
     			if (sub_timer == 35) {
     				mini_rocket_sprite.opacity = 1;
@@ -421,9 +449,10 @@ window.onload = function() {
     				  g2:(118, 25)
     				  g3:(109, 41)
     				*/
-    				var garbage1 = new Sprite(8, 8);
-    				var garbage2 = new Sprite(8, 8);
-    				var garbage3 = new Sprite(8, 8);
+    				mini_rocket_sprite.opacity = 0;
+    				garbage1 = new Sprite(8, 8);
+    				garbage2 = new Sprite(8, 8);
+    				garbage3 = new Sprite(8, 8);
     				garbage1.image = game.assets['img/garbage.png'];
     				garbage2.image = game.assets['img/garbage.png'];
     				garbage3.image = game.assets['img/garbage.png'];
@@ -440,6 +469,23 @@ window.onload = function() {
     				garbage2.tl.delay(5).fadeIn(20);
     				garbage3.tl.delay(10).fadeIn(20);
 
+    			} else if (sub_timer == 190) {
+    				// 星の爆破
+    				fire2_se.play();
+    				garbage1.opacity = garbage2.opacity = garbage3.opacity = 0;
+    				sprite3.tl.delay(10).fadeOut(15);
+    				// 爆発スプライト
+    				explode = new Sprite(64, 64);
+    				explode.image = game.assets['img/explode.png'];
+    				explode.moveTo(160 - 32, 50 + 5);
+    				explode.scale(1.3, 1.3);
+    				explode.opacity = 0.8
+    				game.currentScene.addChild(explode);
+
+    			} else if (sub_timer > 190 && sub_timer <= 190 + 30) {
+    				explode.frame += 1;
+    			} else if (sub_timer == 221) {
+    				explode.tl.fadeOut(5);
     			}
 
     			sub_timer++;
