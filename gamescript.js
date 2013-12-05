@@ -202,6 +202,7 @@ window.onload = function() {
     var fire2_se = Sound.load('sounds/fire02.mp3');
     var plus2_se = Sound.load('sounds/decide4.wav');
     var garbage_se = Sound.load('sounds/beep11.wav');
+    var timedown_se = Sound.load('sounds/pyoro58.wav');
     var game_titlescene_process = function() {
 
     	//game.popScene();
@@ -278,9 +279,11 @@ window.onload = function() {
     		gametimer_sprites[i].frame = rand(7);
     		gametimer_sprites[i].x = 160 - 8 - 16 + 17 * i
     		gametimer_sprites[i].y = 160 - 8;
+    		
     		game.rootScene.addChild(gametimer_sprites[i]);
     	}
-    	var gamelimit_timer = 342;
+    	var gamelimit_timer = 98;
+    	updateLimitTimer();
     	// -----------------------------------------------------------------------
     	// 初期化
     	var rockets = new Array();
@@ -358,6 +361,10 @@ window.onload = function() {
     				}
     			
     		}
+    		if (main_timer % (game.fps) == 0) {
+    			gamelimit_timer--;
+    			updateLimitTimer();
+    		}
     		// BGM 2秒目に演奏を開始する。
     		if (main_timer == game.fps * 2) {
     			bgm.play();
@@ -387,7 +394,7 @@ window.onload = function() {
     		} else {
     			if (rockets[dir].color_id == color_id) {
     				rockets[dir].capacity += 1;
-    				if (rockets[dir].capacity >= 2) { //10
+    				if (rockets[dir].capacity >= 9) { //10
     					plus2_se.play();
     					call_trashscene = 25;
     					rockets[dir].fade = true;
@@ -398,6 +405,11 @@ window.onload = function() {
     					rockets[dir].tl.scaleTo(0.1, 10, 8).and().fadeOut(10);
     				} else {
     					plus_se.play();
+    				}
+    			} else {
+    				rockets[dir].capacity -= 1;
+    				if (rockets[dir].capacity <= 0) {
+    					rockets[dir].capacity = 0;
     				}
     			}
     			
@@ -490,6 +502,18 @@ window.onload = function() {
 
     			sub_timer++;
     		});
+    	}
+    	function updateLimitTimer() {
+    		gametimer_sprites[0].frame = gamelimit_timer / 49;
+    		gametimer_sprites[1].frame = (gamelimit_timer % 49) / 7;
+    		gametimer_sprites[2].frame = (gamelimit_timer % 7)
+    		if (((gamelimit_timer % 49) / 7) == 0 && (gamelimit_timer % 7 == 0) && main_timer > 60)  {
+    			for(var i = 0;i<3;i++) {
+    				// 49の桁が下がりそうになる度振動
+    				gametimer_sprites[i].tl.scaleTo(1, 1.2, 10).delay(4).scaleTo(1.0, 1.0, 10);
+    			}
+    			timedown_se.play();
+    		}
     	}
     	function canInsertUnit() {
     		if (units.length > 8) {
