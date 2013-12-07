@@ -3,6 +3,7 @@
 enchant();
 // 定数の定義
 var UNIT_SPEED_ON_STAGE = 2;
+var ADD_TIMING = [11, 22, 34, 0];
 // クラス、関数の定義
 function Unit_Sprite(color_id){
 	Sprite.apply(this, [24, 24])
@@ -298,6 +299,7 @@ window.onload = function() {
     	var units = new Array();
     	var unit_count = 1;
     	var call_trashscene = 0;
+    	var _log = [];
     	addUnit(3, 1);
     	var each_frame_event = function() {
     		// メイン処理
@@ -317,16 +319,23 @@ window.onload = function() {
     			}
     			
     		}
+    		// ----------------------------------------------------------------------------------------
+    		// バックログ
+
+
+    		// ----------------------------------------------------------------------------------------
     		// 数フレームごとにユニットを追加する
     		/*
     		  メモ:1unitは360度で当然一回転
     		  1frameあたり2度動くので180フレームで一回転
     		  さらに現在30FPSの設定なので6秒で一周する
 
-    		  45度動くたびに判定を行いたい
-    		  23,45
+    		  22.5度動くたびに判定を行いたい
+    		  (度)    22, 44, 68, 90
+    		  (Flame) 11. 22, 34, 45 
     		*/
-    		if (main_timer % 22.5 <= 0.5) {
+
+    		if (ADD_TIMING.indexOf(main_timer % 45) > -1) {
     			if (canInsertUnit()) {
     				/*if (rand(6) == 0) {
     					addUnit(rand(4) + 1, rand(4) + 1);
@@ -340,7 +349,7 @@ window.onload = function() {
 						さらに1目標達成後4色目とする。
 						----------------------------
     				*/
-    				if (game_barance_tempo == 0 && rand(2) == 1) {
+    				if (game_barance_tempo == 0 && rand(5) == 1) {
     					addUnit(rand(4) + 1, 1);
     					if (unit_count <= 5){
     						
@@ -387,29 +396,30 @@ window.onload = function() {
     		unit_count++;
     	}
     	function addPoint(dir, color_id) {
-    		if (rockets[dir].color_id == 0) {
-    			rockets[dir].color_id = color_id;
-    			rockets[dir].capacity = 1;
+    		var r = rockets[dir];
+    		if (r.color_id == 0) {
+    			r.color_id = color_id;
+    			r.capacity = 1;
     			plus_se.play();
     		} else {
-    			if (rockets[dir].color_id == color_id) {
-    				rockets[dir].capacity += 1;
-    				if (rockets[dir].capacity >= 9) { //10
+    			if (r.color_id == color_id) {
+    				r.capacity += 1;
+    				if (r.capacity >= 9) { //10
     					plus2_se.play();
     					call_trashscene = 25;
-    					rockets[dir].fade = true;
-    					rockets[dir].frame += 1;
+    					r.fade = true;
+    					r.frame += 1;
     					// reset
-    					rockets[dir].capacity = 0;
-    					rockets[dir].color_id = 0;
-    					rockets[dir].tl.scaleTo(0.1, 10, 8).and().fadeOut(10);
+    					r.capacity = 0;
+    					r.color_id = 0;
+    					r.tl.scaleTo(0.1, 10, 8).and().fadeOut(8).then(function() {r.fade = false;}).scaleTo(1,1,1);
     				} else {
     					plus_se.play();
     				}
     			} else {
-    				rockets[dir].capacity -= 1;
-    				if (rockets[dir].capacity <= 0) {
-    					rockets[dir].capacity = 0;
+    				r.capacity -= 1;
+    				if (r.capacity <= 0) {
+    					r.capacity = 0;
     				}
     			}
     			
@@ -498,6 +508,12 @@ window.onload = function() {
     				explode.frame += 1;
     			} else if (sub_timer == 221) {
     				explode.tl.fadeOut(5);
+
+    			} else if (sub_timer == 240) {
+    				sprite1.tl.fadeOut(10);
+    				sprite2.tl.fadeOut(10);
+    			} else if (sub_timer == 250) {
+    				game.popScene();
     			}
 
     			sub_timer++;
