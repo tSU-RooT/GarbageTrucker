@@ -5,8 +5,8 @@ enchant();
 var UNIT_SPEED_ON_STAGE = 2;
 var ADD_TIMING = [11, 22, 34, 0];
 // クラス、関数の定義
-function Unit_Sprite(color_id){
-	Sprite.apply(this, [24, 24])
+function Unit_Sprite(color_id) {
+	Sprite.apply(this, [24, 24]);
 	this.r = 0;
 	this.theta = 0;
 	this.timer = 0;
@@ -23,6 +23,7 @@ function Unit_Sprite(color_id){
 		if (this.trans) {
 			return;
 		}
+
 		if (this.timer < 42 * 2) {
 			this.r -= 2;
 		} else if (this.timer >= 42 * 2 && this.timer < (42 * 2) + 10) {
@@ -50,25 +51,25 @@ function Unit_Sprite(color_id){
 					// 右上
 					move_to_x = 180 + 6;
 					move_to_y = 10 + 14;
-					dispose_process = function() {this.can_dispose = 1;}
+					dispose_process = function() {this.can_dispose = 4;}
 				}
 				if (this.x >= 240 && this.y >= 240) {
 					// 右下
 					move_to_x = 270 + 6;
 					move_to_y = 178 + 14;
-					dispose_process = function() {this.can_dispose = 2;}
+					dispose_process = function() {this.can_dispose = 3;}
 				}
 				if (this.x <= 80 && this.y <= 80) {
 					// 左上
 					move_to_x = 14 + 6;
 					move_to_y = 90 + 14;
-					dispose_process = function() {this.can_dispose = 4;}
+					dispose_process = function() {this.can_dispose = 1;}
 				}
 				if (this.x <= 80 && this.y >= 240) {
 					// 左下
 					move_to_x = 104 + 6;
 					move_to_y = 258 + 14;
-					dispose_process = function() {this.can_dispose = 3;}
+					dispose_process = function() {this.can_dispose = 2;}
 				}
 				this.tl.delay(6).moveTo(move_to_x, move_to_y, 16).and()
 					.rotateTo(0, 5).and().fadeOut(24).and().scaleTo(1.8, 1.8, 16)
@@ -77,13 +78,13 @@ function Unit_Sprite(color_id){
 			this.shift += 1;
 		} else {
     		this.theta -= UNIT_SPEED_ON_STAGE;
-    		if (this.theta < 0) {
-    			this.theta += 360;
-    		} else if (this.theta > 360) {
-    			this.theta -= 360;
-    		}
     		this.rotation = 180 - this.theta;
 		}
+		if (this.theta < 0) {
+    		this.theta += 360;
+    	} else if (this.theta > 360) {
+    		this.theta -= 360;
+    	}
     	this.setPolarToXY();	
 	};
 	this.setPolarToXY = function() {
@@ -117,7 +118,7 @@ Unit_Sprite.constructor = Unit_Sprite;
 function Rocket_Sprite(di_i, color_i) {
 	/*
 		プロパティ direction_idに関する仕様
-		右上から左回り(反時計周り)に1,2,3,4と振り分ける	
+		左上から左回り(反時計周り)に1,2,3,4と振り分ける	
 	*/
 	Sprite.apply(this, [36, 52]);
 	this.capacity = 0;
@@ -137,16 +138,16 @@ function Rocket_Sprite(di_i, color_i) {
 		this.opacity = 0;
 	}
 	switch(di_i) {
-		case 1:
+		case 4:
 			this.moveTo(180, 10);
 			break;
-		case 2:
+		case 3:
 			this.moveTo(270, 178);
 			break;
-		case 3:
+		case 2:
 			this.moveTo(104, 258);
 			break;
-		case 4:
+		case 1:
 			this.moveTo(14, 90);
 			break;
 	}
@@ -170,9 +171,9 @@ Rocket_Sprite.constructor = Rocket_Sprite;
 
 
 // クラス定義終わり
-var _input = 0;
+var _touched = false
 function pressSpaceKey() {
-	return game.input.a == 1;
+	return (game.input.a == 1) || _touched;
 }
 function rand(max) {
 	return Math.floor(Math.random() * max);
@@ -204,6 +205,7 @@ window.onload = function() {
     var plus2_se = Sound.load('sounds/decide4.wav');
     var garbage_se = Sound.load('sounds/beep11.wav');
     var timedown_se = Sound.load('sounds/pyoro58.wav');
+
     var game_titlescene_process = function() {
 
     	//game.popScene();
@@ -214,6 +216,7 @@ window.onload = function() {
     	title_sprite.tl.fadeIn(35);
     	game.rootScene.addChild(title_sprite);
     	var clicked = false;
+
     	title_sprite.addEventListener('touchstart', function() {clicked = true;});
     	game.rootScene.addEventListener('enterframe', function() {
     		if (pressSpaceKey() || clicked) {
@@ -293,14 +296,18 @@ window.onload = function() {
 			rockets[i].image = game.assets["img/rockets.png"];
 			game.rootScene.addChild(rockets[i]);
 		}
+		var touch_sprite = new Sprite(320 ,320);
+		touch_sprite.addEventListener('touchstart', function() {_touched = true;});
+		touch_sprite.addEventListener('touchend', function() {_touched = false;});
+		game.rootScene.addChild(touch_sprite);
     	// メイン処理使用変数の初期化
     	var main_timer = 1;
     	var game_barance_tempo = 0;
     	var units = new Array();
-    	var unit_count = 1;
+    	var unit_count = 0;
     	var call_trashscene = 0;
     	var _log = [];
-    	addUnit(3, 1);
+    	//addUnit(1, 1);
     	var each_frame_event = function() {
     		// メイン処理
     		// ユニットの更新処理と破棄
@@ -316,18 +323,32 @@ window.onload = function() {
     			units[i].update();
     			if (pressSpaceKey() && units[i].canShift()) {
     					units[i].shift = 1;
-    			}
+    			};
     			
     		}
     		// ----------------------------------------------------------------------------------------
     		// バックログ
-
+    		if (main_timer % 100 == 0 && _log.length >= 2) {
+    			for (var i = _log.length;i >= 1;i--) {
+    				for (var i2 = i - 1;i2 >= 0;i2--) {
+    					if (units[i] instanceof Unit_Sprite) {
+    						//console.log(units[0].r);
+    						if (units[i].r == units[i2].r && units[i].r == 74) {
+    							if (Math.abs(units[i].theta - units[i2].theta) <= 2) {
+    								console.log("units[" + i2 + "].theta:" + _log[i][i2]);
+    							}
+    					    }
+    					}
+    					
+    				}
+    			}
+    		}
 
     		// ----------------------------------------------------------------------------------------
     		// 数フレームごとにユニットを追加する
     		/*
     		  メモ:1unitは360度で当然一回転
-    		  1frameあたり2度動くので180フレームで一回転
+    		  1frameあたり2度動くので180フレームで
     		  さらに現在30FPSの設定なので6秒で一周する
 
     		  22.5度動くたびに判定を行いたい
@@ -336,7 +357,16 @@ window.onload = function() {
     		*/
 
     		if (ADD_TIMING.indexOf(main_timer % 45) > -1) {
-    			if (canInsertUnit()) {
+    			// まず投入可能方向を取得する。
+    			var can_dir = getCanInsertDirection();
+    			if (can_dir.length > 0 && rand(3) == 0) {
+    				console.log(can_dir);
+
+    				addUnit(can_dir[rand(can_dir.length)], 1);
+    			}
+
+
+    			if (1) {
     				/*if (rand(6) == 0) {
     					addUnit(rand(4) + 1, rand(4) + 1);
     				}*/
@@ -350,7 +380,8 @@ window.onload = function() {
 						----------------------------
     				*/
     				if (game_barance_tempo == 0 && rand(5) == 1) {
-    					addUnit(rand(4) + 1, 1);
+    					//addUnit(rand(4) + 1, 1);
+
     					if (unit_count <= 5){
     						
     					}
@@ -384,16 +415,27 @@ window.onload = function() {
     	game.rootScene.addEventListener('enterframe', each_frame_event);
     	
     	function addUnit(dir, color_id) {
-    		var unit_sprite = new Unit_Sprite(color_id);
+    		//var unit_sprite = new Unit_Sprite(color_id);
+    		var unit_sprite = new Unit_Sprite((unit_count % 4) + 1);
     		unit_sprite.image = game.assets['img/units.png'];
     		unit_sprite.originX = unit_sprite.originY = 12;
-    		unit_sprite.rotate(135 - 90 * dir);
+    		unit_sprite.rotate(135 - 90 * (dir - 1));
     		unit_sprite.r = 240;
-    		unit_sprite.theta = 135 + 90 * dir;
+    		unit_sprite.theta = 135 + 90 * (dir - 1);
     		unit_sprite.setPolarToXY();
-    		game.rootScene.addChild(unit_sprite);
+    		game.rootScene.addChild(unit_sprite); 
+    		var temp = new Array();
+    		console.log("Unit Number:" + (unit_count + 1));
+    		for (var i = 0;i<units.length;i++) {
+    			var u = units[i];
+    			console.log("id:" + i + " color:" + u.color_id + " r:" + u.r + " theta:" + u.theta);
+    			temp.push(units[i].theta);
+    		}
+    		_log.push(temp);
     		units.push(unit_sprite);
     		unit_count++;
+
+
     	}
     	function addPoint(dir, color_id) {
     		var r = rockets[dir];
@@ -531,34 +573,48 @@ window.onload = function() {
     			timedown_se.play();
     		}
     	}
-    	function canInsertUnit() {
-    		if (units.length > 8) {
-    			return false;
+
+    	function getCanInsertDirection() {
+    		if (units.length > 6 * 3) {
+    			return [];
     		}
-    		var collision = false;
-    		// 45-50フレーム後のユニット同士のシフト処理の競合をチェックします
-    		// 48フレームで定義
-    		for(var i = 0;i<units.length;i++) {
-    			if (units[i].canShift(-50 * UNIT_SPEED_ON_STAGE)) {
-    				collision = true;
-    			}
-    			if (units[i].canShift(-49 * UNIT_SPEED_ON_STAGE)) {
-    				collision = true;
-    			}
-    			if (units[i].canShift(-48 * UNIT_SPEED_ON_STAGE)) {
-    				collision = true;
-    			}
-    			if (units[i].canShift(-47 * UNIT_SPEED_ON_STAGE)) {
-    				collision = true;
-    			}
-    			if (units[i].canShift(-46 * UNIT_SPEED_ON_STAGE)) {
-    				collision = true;
-    			}
-    			if (units[i].canShift(-45 * UNIT_SPEED_ON_STAGE)) {
-    				collision = true;
+    		var foo = [true, true, true, true]
+    		for (var i = 0;i<units.length;i++) {
+    			var u = units[i];
+    			if (u.r > 74) {
+    				if (u.r == 150) {
+    					if (u.theta == 225) {
+    						foo[0] = false;
+    					}
+    					if (u.theta == 315) {
+    						foo[1] = false;
+    					}
+    					if (u.theta == 45) {
+    						foo[2] = false;
+    					}
+    					if (u.theta == 135) {
+    						foo[3] = false;
+    					}
+    				}
+    			} else {
+    				if (Math.abs(321 - u.theta) <= 6) {
+    					foo[0] = false;
+    				} else if (Math.abs(51 - u.theta) <= 6) {
+    					foo[1] = false;
+    				} else if (Math.abs(141 - u.theta) <= 6) {
+    					foo[2] = false;
+    				} else if (Math.abs(231 - u.theta) <= 6) {
+    					foo[3] = false;
+    				}
     			}
     		}
-    		return !collision;
+    		var bar = [];
+    		for (var i = 0;i<4;i++) {
+    			if (foo[i]) {
+    				bar.push(i + 1);
+    			}
+    		}
+    		return bar;
     	}
     };
     //game.onload = game_titlescene_process;
