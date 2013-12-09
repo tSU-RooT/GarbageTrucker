@@ -198,6 +198,8 @@ window.onload = function() {
     game.preload('img/num_char.png');
     game.fps = 15 * 2;
     game.scale = 6;
+    game.star = "moon"
+    game.star_garbage = 0;
     var bgm = Sound.load('sounds/bgm.mp3');
     var plus_se = Sound.load('sounds/button09.mp3');
     var fire_se = Sound.load('sounds/fire01.wav');
@@ -485,9 +487,7 @@ window.onload = function() {
     		sprite3.tl.fadeIn(12);
     		var sub_timer = 1;
     		var explode;
-    		var garbage1;
-    		var garbage2;
-    		var garbage3;
+    		var garbages;
     		var label;
     		game.currentScene.addEventListener('enterframe', function() {
     			if (sub_timer == 35) {
@@ -506,7 +506,7 @@ window.onload = function() {
     				label = new Label();
     				label.color = "#ffffff";
     				label.font = "13px sans-serif";
-    				label.text = ">garbage.emit(moon)";
+    				label.text = ">garbage.emit(" + game.star +")";
     				label.x = 60;
     				label.y = 125;
     				var sound = function() {
@@ -514,59 +514,73 @@ window.onload = function() {
     				}
     				label.tl.delay(2).then(sound).delay(18).fadeOut(1).delay(8).fadeIn(1).loop();
     				game.currentScene.addChild(label);
-    			} else if (sub_timer == 220) {
+    			} else if (sub_timer == 188) {
     				label.tl.unloop();
     				label.tl.removeFromScene();
-    			} else if (sub_timer == 260) {
+    			} else if (sub_timer == 230) {
     				/*
     				  g1:(96, 18)
     				  g2:(118, 25)
     				  g3:(109, 41)
     				*/
     				mini_rocket_sprite.opacity = 0;
-    				garbage1 = new Sprite(8, 8);
-    				garbage2 = new Sprite(8, 8);
-    				garbage3 = new Sprite(8, 8);
-    				garbage1.image = game.assets['img/garbage.png'];
-    				garbage2.image = game.assets['img/garbage.png'];
-    				garbage3.image = game.assets['img/garbage.png'];
-    				garbage1.opacity = garbage2.opacity = garbage3.opacity = 0;
+    				game.star_garbage += 1; // ゴミを足す
+    				garbages = [];
+    				for (var i=0;i<3;i++) {
+    					garbages[i] = new Sprite(8, 8);
+    					garbages[i].image = game.assets['img/garbage.png'];
+    					garbages[i].opacity = 0;
+    					game.currentScene.addChild(garbages[i]);
+    				}
     				
-    				garbage1.moveTo(96 + 50, 18 + 50);
-    				garbage2.moveTo(118 + 50, 25 + 50);
-    				garbage3.moveTo(109 + 50, 41 + 50);
-    				game.currentScene.addChild(garbage1);
-    				game.currentScene.addChild(garbage2);
-    				game.currentScene.addChild(garbage3);
+    				garbages[0].moveTo(96 + 50, 18 + 50);
+    				garbages[1].moveTo(118 + 50, 25 + 50);
+    				garbages[2].moveTo(109 + 50, 41 + 50);
     				garbage_se.play();
-    				garbage1.tl.fadeIn(20);
-    				garbage2.tl.delay(5).fadeIn(20);
-    				garbage3.tl.delay(10).fadeIn(20);
+    				garbages[0].tl.fadeIn(20);
+    				if (game.star_garbage >= 2) {
+    					garbages[1].tl.delay(5).fadeIn(20);
+    				}
+    				if (game.star_garbage >= 3) {
+    					garbages[2].tl.delay(10).fadeIn(20);
 
-    			} else if (sub_timer == 215) {
+    				}
 
-    			} else if (sub_timer == 330) {
-    				// 星の爆破
-    				fire2_se.play();
-    				garbage1.opacity = garbage2.opacity = garbage3.opacity = 0;
-    				sprite3.tl.delay(10).fadeOut(15);
-    				// 爆発スプライト
-    				explode = new Sprite(64, 64);
-    				explode.image = game.assets['img/explode.png'];
-    				explode.moveTo(160 - 32, 50 + 5);
-    				explode.scale(1.3, 1.3);
-    				explode.opacity = 0.8
-    				game.currentScene.addChild(explode);
-
-    			} else if (sub_timer > 330 && sub_timer <= 330 + 30) {
+    			} else if (sub_timer == 300) {
+    				if (game.star_garbage >= 3) {
+    					// 星の爆破
+    					fire2_se.play();
+    					for (var i=0;i<3;i++) {
+    					  garbages[i].opacity = 0;
+    					}
+    					sprite3.tl.delay(10).fadeOut(15);
+    					// 爆発スプライト
+    					explode = new Sprite(64, 64);
+    					explode.image = game.assets['img/explode.png'];
+    					explode.moveTo(160 - 32, 50 + 5);
+    					explode.scale(1.3, 1.3);
+    					explode.opacity = 0.8
+    					game.currentScene.addChild(explode);
+    				} else {
+    					for (var i=0;i<3;i++) {
+    					  garbages[i].tl.fadeOut(10);
+    					}
+    					sprite1.tl.fadeOut(10);
+    					sprite2.tl.fadeOut(10);
+    					sprite3.tl.fadeOut(10);
+    				}
+    			} else if (sub_timer > 300 && sub_timer <= 300 + 30 && game.star_garbage >= 3) {
     				explode.frame += 1;
-    			} else if (sub_timer == 361) {
-    				explode.tl.fadeOut(5);
-
-    			} else if (sub_timer == 380) {
+    			} else if (sub_timer == 331) {
+    				if (game.star_garbage >= 3) {
+    					explode.tl.fadeOut(5);
+    				} else {
+    					game.popScene();
+    				}
+    			} else if (sub_timer == 350) {
     				sprite1.tl.fadeOut(10);
     				sprite2.tl.fadeOut(10);
-    			} else if (sub_timer == 390) {
+    			} else if (sub_timer == 360) {
     				game.popScene();
     			}
 
