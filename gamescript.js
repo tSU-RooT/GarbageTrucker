@@ -204,6 +204,7 @@ window.onload = function() {
     var fire2_se = Sound.load('sounds/fire02.mp3');
     var plus2_se = Sound.load('sounds/decide4.wav');
     var garbage_se = Sound.load('sounds/beep11.wav');
+    var cursor_se = Sound.load('sounds/cursor31.wav');
     var timedown_se = Sound.load('sounds/pyoro58.wav');
 
     var game_titlescene_process = function() {
@@ -307,7 +308,7 @@ window.onload = function() {
     	var unit_count = 0;
     	var call_trashscene = 0;
     	var _log = [];
-    	//addUnit(1, 1);
+    	addUnit(1, 1);
     	var each_frame_event = function() {
     		// メイン処理
     		// ユニットの更新処理と破棄
@@ -357,31 +358,25 @@ window.onload = function() {
     		*/
 
     		if (ADD_TIMING.indexOf(main_timer % 45) > -1) {
-    			// まず投入可能方向を取得する。
-    			var can_dir = getCanInsertDirection();
-    			if (can_dir.length > 0 && rand(3) == 0) {
-    				console.log(can_dir);
-
-    				addUnit(can_dir[rand(can_dir.length)], 1);
-    			}
-
+    			
 
     			if (1) {
-    				/*if (rand(6) == 0) {
-    					addUnit(rand(4) + 1, rand(4) + 1);
-    				}*/
 
     				// ユニットの投入バランスの考慮
     				/*
 						----------------------------
-						バランス考慮として初期は赤しか投入しない、規定時間経過後第二色を投入
-						最初の打ち上げ後3色目を投入
-						さらに1目標達成後4色目とする。
+						バランス考慮として初期は赤しか投入しない、
+						最初の打ち上げ後2色目を投入
+						さらに1目標達成後3色目とする。
 						----------------------------
     				*/
-    				if (game_barance_tempo == 0 && rand(5) == 1) {
-    					//addUnit(rand(4) + 1, 1);
-
+    				// まず投入可能方向を取得する。
+    				var can_dir = getCanInsertDirection();
+    				if (rand(4) == 0 && can_dir.length > 0) {
+    					addUnit(can_dir[rand(can_dir.length)], 1)
+    				}
+    				
+    				if (game_barance_tempo == 0) {
     					if (unit_count <= 5){
     						
     					}
@@ -415,8 +410,7 @@ window.onload = function() {
     	game.rootScene.addEventListener('enterframe', each_frame_event);
     	
     	function addUnit(dir, color_id) {
-    		//var unit_sprite = new Unit_Sprite(color_id);
-    		var unit_sprite = new Unit_Sprite((unit_count % 4) + 1);
+    		var unit_sprite = new Unit_Sprite(color_id);
     		unit_sprite.image = game.assets['img/units.png'];
     		unit_sprite.originX = unit_sprite.originY = 12;
     		unit_sprite.rotate(135 - 90 * (dir - 1));
@@ -494,6 +488,7 @@ window.onload = function() {
     		var garbage1;
     		var garbage2;
     		var garbage3;
+    		var label;
     		game.currentScene.addEventListener('enterframe', function() {
     			if (sub_timer == 35) {
     				mini_rocket_sprite.opacity = 1;
@@ -508,6 +503,21 @@ window.onload = function() {
     				// ∫(-ax^2 + bx)dx = 120 → a = 0.0074074
     				// f'(x) = -2ax + b && f'(23) = 0 → b = 46a
     			} else if (sub_timer == 100) {
+    				label = new Label();
+    				label.color = "#ffffff";
+    				label.font = "13px sans-serif";
+    				label.text = ">garbage.emit(moon)";
+    				label.x = 60;
+    				label.y = 125;
+    				var sound = function() {
+    					cursor_se.play();
+    				}
+    				label.tl.delay(2).then(sound).delay(18).fadeOut(1).delay(8).fadeIn(1).loop();
+    				game.currentScene.addChild(label);
+    			} else if (sub_timer == 220) {
+    				label.tl.unloop();
+    				label.tl.removeFromScene();
+    			} else if (sub_timer == 260) {
     				/*
     				  g1:(96, 18)
     				  g2:(118, 25)
@@ -533,7 +543,9 @@ window.onload = function() {
     				garbage2.tl.delay(5).fadeIn(20);
     				garbage3.tl.delay(10).fadeIn(20);
 
-    			} else if (sub_timer == 190) {
+    			} else if (sub_timer == 215) {
+
+    			} else if (sub_timer == 330) {
     				// 星の爆破
     				fire2_se.play();
     				garbage1.opacity = garbage2.opacity = garbage3.opacity = 0;
@@ -546,15 +558,15 @@ window.onload = function() {
     				explode.opacity = 0.8
     				game.currentScene.addChild(explode);
 
-    			} else if (sub_timer > 190 && sub_timer <= 190 + 30) {
+    			} else if (sub_timer > 330 && sub_timer <= 330 + 30) {
     				explode.frame += 1;
-    			} else if (sub_timer == 221) {
+    			} else if (sub_timer == 361) {
     				explode.tl.fadeOut(5);
 
-    			} else if (sub_timer == 240) {
+    			} else if (sub_timer == 380) {
     				sprite1.tl.fadeOut(10);
     				sprite2.tl.fadeOut(10);
-    			} else if (sub_timer == 250) {
+    			} else if (sub_timer == 390) {
     				game.popScene();
     			}
 
@@ -586,13 +598,13 @@ window.onload = function() {
     					if (u.theta == 225) {
     						foo[0] = false;
     					}
-    					if (u.theta == 315) {
+    					else if (u.theta == 315) {
     						foo[1] = false;
     					}
-    					if (u.theta == 45) {
+    					else if (u.theta == 45) {
     						foo[2] = false;
     					}
-    					if (u.theta == 135) {
+    					else if (u.theta == 135) {
     						foo[3] = false;
     					}
     				}
@@ -617,7 +629,6 @@ window.onload = function() {
     		return bar;
     	}
     };
-    //game.onload = game_titlescene_process;
     game.onload = game_main_process;
     game.start();
 
