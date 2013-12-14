@@ -190,7 +190,6 @@ window.onload = function() {
     game.preload('img/stage.png');
     game.preload('img/rockets.png');
     game.preload('img/background.png');
-    game.preload('img/moon.png');
     game.preload('img/earth_.png');
     game.preload('img/window.png');
     game.preload('img/rocket_mini.png');
@@ -202,48 +201,40 @@ window.onload = function() {
     	game.preload("img/" + STARS[i] + ".png");
     }
     game.fps = 15 * 2;
-    game.scale = 6;
+    //game.scale = 6;
     game.star = "moon"
-    game.star_id = 3;//0
+    game.star_id = 7;//0
+    game.score = 123456//0;
     game.star_garbage = 2;//0;
 
-    var bgm = Sound.load('sounds/bgm.mp3');
-    var plus_se = Sound.load('sounds/button09.mp3');
-    var fire_se = Sound.load('sounds/fire01.wav');
-    var fire2_se = Sound.load('sounds/fire02.mp3');
-    var plus2_se = Sound.load('sounds/decide4.wav');
-    var garbage_se = Sound.load('sounds/beep11.wav');
-    var cursor_se = Sound.load('sounds/cursor31.wav');
-    var show_se = Sound.load('sounds/decide2.wav');
-    var beep_se = Sound.load('sounds/beep05.wav');
-    var timedown_se = Sound.load('sounds/pyoro58.wav');
+    game.preload(['sounds/bgm.mp3', 'sounds/button09.mp3', 'sounds/fire01.wav', 'sounds/fire02.mp3', 'sounds/decide4.wav', 'sounds/beep11.wav',
+                  'sounds/cursor31.wav', 'sounds/crash10.wav', 'sounds/beep05.wav', 'sounds/pyoro58.wav']);
+    var bgm;
+    var plus_se;
+    var fire_se;
+    var fire2_se;
+    var plus2_se;
+    var garbage_se;
+    var cursor_se;
+    var show_se;
+    var beep_se;
+    var timedown_se;
+    function soundset() {
+        bgm = game.assets["sounds/bgm.mp3"];
+        plus_se = game.assets["sounds/button09.mp3"];
+        fire_se = game.assets['sounds/fire01.wav'];
+        fire2_se = game.assets['sounds/fire02.mp3'];
+        plus2_se = game.assets['sounds/decide4.wav'];
+        garbage_se = game.assets['sounds/beep11.wav'];
+        cursor_se = game.assets['sounds/cursor31.wav'];
+        show_se = game.assets['sounds/crash10.wav'];
+        beep_se = game.assets['sounds/beep05.wav'];
+        timedown_se = game.assets['sounds/pyoro58.wav'];
+    }
 
-    var game_titlescene_process = function() {
-
-    	//game.popScene();
-    	//game.pushScene(new Scene());
-    	var title_sprite = new Sprite(320, 320);
-    	title_sprite.image = game.assets['img/title.png'];
-    	title_sprite.opacity = 0;
-    	title_sprite.tl.fadeIn(35);
-    	game.rootScene.addChild(title_sprite);
-    	var clicked = false;
-
-    	title_sprite.addEventListener('touchstart', function() {clicked = true;});
-    	game.rootScene.addEventListener('enterframe', function() {
-    		if (pressSpaceKey() || clicked) {
-    			//game.popScene();
-    			//game.replaceScene(new Scene());
-    			game.onload = game_main_process;
-    			title_sprite.opacity = 0;
-    			game.onload();
-    		}
-    	});
-
-    };
-    
     var game_main_process = function() {
     	// メイン画面の処理
+        soundset();
     	// バックグラウンド
     	var background_sprite = new Sprite(640, 640);
     	background_sprite.image = game.assets['img/background.png'];
@@ -630,6 +621,7 @@ window.onload = function() {
     			sub_timer++;
     		});
     	}
+
     	function showScoreScene() {
     		//game.popScene();
     		bgm.stop();
@@ -639,36 +631,75 @@ window.onload = function() {
 
     		back_sprite.image = game.assets["img/violet.png"];
     		back_sprite.opacity = 0;
-    		back_sprite.tl.fadeTo(0.65, 50);
+    		back_sprite.tl.fadeTo(1, 50);
     		game.currentScene.addChild(back_sprite);
     		var sub_timer = 1;
     		var s_index = 0;
     		var showed_star = false;
+    		var label1;
+    		var label2;
+    		var add_delta = parseInt(game.score / (game.fps * 2.5))
+    		var call_gameend = 0;
     		game.currentScene.addEventListener('enterframe', function() {
+    			if (sub_timer == 80) {
+    				label1 = new Label();
+    				label1.text = "Your SCORE"
+    				label1.moveTo(10, 10);
+    				label1.color = "#ffffff";
+    				label1.font = "20px sans-serif";
+    				game.currentScene.addChild(label1);
+    				label2 = new Label();
+    				label2.moveTo(105, 60);
+    				label2.text = "0";
+    				label2.color = "#ffffff";
+    				label2.font = "35px sans-serif";
+    				label2.num = 0;
+    				label2.opacity = 0;
+    				game.currentScene.addChild(label2);
+    			}
     			if (sub_timer >= 140 && (sub_timer - 140) % 25 == 0) {
     				if (s_index < game.star_id) {
     					var im = game.assets["img/"+STARS[s_index] + ".png"];
     					var sp = new Sprite(im.width, im.height);
     					sp.image = im;
     					sp.opacity = 0;
-    					sp.scale(5, 5);
+    					sp.originX = im.width / 2;
+    					sp.originY = im.height / 2;
+    					sp.scale(3, 3);
     					game.currentScene.addChild(sp);
     					star_sprites.push(sp);
-    					if (s_index > 0) {
+    					if (s_index == 5) {
+    						sp.moveTo(-80 ,190 - im.height / 2 + 55 + 5);
+    					} else if (s_index > 0) {
     						var sp2 = star_sprites[s_index - 1];
-    						sp.x = sp2.x + sp2.image.width + 5;
-    						sp.y = 190 - im.height / 2;
+    						sp.x = sp2.x + 55 + 5;
+    						sp.y = 190 - im.height / 2 + (60 * parseInt(s_index / 5));
     					} else {
-    						sp.moveTo(50 ,190 - im.height / 2);
+    						sp.moveTo(-80 ,190 - im.height / 2);
     					}
-    					sp.tl.fadeIn(20).and().scaleTo(1, 1, 20);
-    					show_se.play();
+    					sp.tl.fadeIn(20).and().scaleTo(0.6, 0.6, 20);
+    					show_se.clone().play();
     					s_index++;
     				} else {
+    					label2.tl.fadeIn(15);
     					showed_star = true;
     				}
     			} else if (showed_star) {
-
+    				if (label2.num < game.score) {
+    					label2.num += add_delta;
+    					if (label2.num > game.score) {
+    						label2.num = game.score;
+    					}
+    					label2.text = String(label2.num);
+    				} else {
+    					call_gameend = 25;
+    				}
+    			}
+    			if (call_gameend > 0) {
+    				call_gameend--;
+    				if (call_gameend == 0) {
+    					game.end(game.score, "初級:火星への到達");
+    				}
     			}
     			sub_timer++;
     		});
@@ -677,7 +708,7 @@ window.onload = function() {
     		gametimer_sprites[0].frame = gamelimit_timer / 49;
     		gametimer_sprites[1].frame = (gamelimit_timer % 49) / 7;
     		gametimer_sprites[2].frame = (gamelimit_timer % 7)
-    		if (gamelimit_timer == 0) {
+    		if (gamelimit_timer <= 0) {
     			gametimer_sprites[0].frame = gametimer_sprites[1].frame = gametimer_sprites[2].frame = 0;
     		}
     		if (((gamelimit_timer % 49) / 7) == 0 && (gamelimit_timer % 7 == 0) && main_timer > 60 && gamelimit_timer >= 0)  {
