@@ -304,7 +304,7 @@ window.onload = function() {
     		
     		game.rootScene.addChild(gametimer_sprites[i]);
     	}
-    	var gamelimit_timer = 10;//98;
+    	var gamelimit_timer = 98;//98;
     	updateLimitTimer();
     	// -----------------------------------------------------------------------
     	// 初期化
@@ -318,6 +318,20 @@ window.onload = function() {
 		touch_sprite.addEventListener('touchstart', function() {_touched = true;});
 		touch_sprite.addEventListener('touchend', function() {_touched = false;});
 		game.rootScene.addChild(touch_sprite);
+        var silentmark_sprite = null;
+        if (USER_AGENT.indexOf("android") > -1 || USER_AGENT.indexOf("iphone") > -1) {
+            silentmark_sprite = new Sprite(32, 32);
+            silentmark_sprite.image = game.assets["img/silent.png"];
+            silentmark_sprite.moveTo(125, 16);
+            silentmark_sprite.opacity = 0.8;
+            silentmark_sprite.addEventListener('touchstart', function() {
+                soundon = false;
+                if (bgm) {
+                    bgm.stop();
+                }
+            });
+            game.rootScene.addChild(silentmark_sprite);
+        }
     	// メイン処理使用変数の初期化
     	var main_timer = 1;
     	var game_barance_tempo = 0;
@@ -406,6 +420,7 @@ window.onload = function() {
     				}
     			
     		}
+
     		// 	中央タイマー処理
     		if (main_timer % (game.fps) == 0) {
     			
@@ -417,6 +432,11 @@ window.onload = function() {
     		if (main_timer == game.fps * 2) {
     			sound_play(bgm);
     		}
+            // ゲーム開始20秒目に モバイル用消音ボタンを消去する    
+            if (main_timer == game.fps * 20 && silentmark_sprite != null) {
+                silentmark_sprite.tl.fadeOut(15).removeFromScene();
+                
+            }
     		// メインタイマーの加算
     		main_timer += 1;
     	}
