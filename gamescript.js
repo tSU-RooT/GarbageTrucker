@@ -219,7 +219,7 @@ window.onload = function() {
     game.fps = 30;
     //game.scale = 6;
     game.star = "moon"
-    game.star_id = 0;
+    game.star_id = 4;//0;
     game.score = 0;
     game.star_garbage = 0;//0;
 
@@ -311,7 +311,7 @@ window.onload = function() {
     		
     		game.rootScene.addChild(gametimer_sprites[i]);
     	}
-    	var gamelimit_timer = 70;//98;
+    	var gamelimit_timer = 65;//98;
     	updateLimitTimer();
     	// -----------------------------------------------------------------------
     	// 初期化
@@ -427,9 +427,19 @@ window.onload = function() {
                             var RATIO = [1, 1, 2, 2, 2];
                             addUnit(can_dir[rand(can_dir.length)], RATIO[rand(RATIO.length)]);
                         }
-                    } else if (game_balance_tempo >= 8 && game_balance_tempo <= 20) {
-                        if (rand(4) == 0) {
+                    } else if (game_balance_tempo >= 8 && game_balance_tempo <= 12) {
+                        if (rand(3) == 0) {
                             var RATIO = [1, 1, 1, 2, 2, 3, 3];
+                            addUnit(can_dir[rand(can_dir.length)], RATIO[rand(RATIO.length)]);
+                        }
+                    } else if (game_balance_tempo >= 13 && game_balance_tempo <= 18) {
+                        if (rand(3) == 0) {
+                            var RATIO = [1, 2, 3];
+                            addUnit(can_dir[rand(can_dir.length)], RATIO[rand(RATIO.length)]);
+                        }
+                    } else if (game_balance_tempo >= 19 && game_balance_tempo <= 28) {
+                        if (rand(3) == 0) {
+                            var RATIO = [1, 1, 2, 2, 3, 4];
                             addUnit(can_dir[rand(can_dir.length)], RATIO[rand(RATIO.length)]);
                         }
                     }
@@ -440,7 +450,9 @@ window.onload = function() {
     		// 別画面の呼び出しがある場合、指定フレーム後に呼び出す
     		if (call_gamescore_scene > 0) {
     				call_gamescore_scene--;
-    				bgm.volume -= 0.015;
+    				if (bgm) {
+                        bgm.volume -= 0.015;
+                    }
     				if (call_gamescore_scene == 0) {
     					showScoreScene();
     				}
@@ -461,10 +473,18 @@ window.onload = function() {
     			
     			updateLimitTimer();
     		}
-    		// BGM 2秒目に演奏を開始する。
-    		if (main_timer == game.fps * 2) {
-    			sound_play(bgm);
-    		}
+            if (bgm) {
+                // BGM 2秒目に演奏を開始する。
+                if (main_timer == game.fps * 2) {
+                    sound_play(bgm);
+                }
+                // 演奏終了していたら再演奏する
+                if (bgm.currentTime >= bgm.duration && main_timer > game.fps * 3) {
+                    bgm.stop();
+                    sound_play(bgm);
+
+                }
+            }
             // ゲーム開始20秒目に モバイル用消音ボタンを消去する    
             if (main_timer == game.fps * 20 && silentmark_sprite != null) {
                 silentmark_sprite.tl.fadeOut(15).removeFromScene();
@@ -486,8 +506,6 @@ window.onload = function() {
     		game.rootScene.addChild(unit_sprite); 
     		units.push(unit_sprite);
     		unit_count++;
-
-
     	}
     	function addPoint(dir, color_id) {
     		var r = rockets[dir];
@@ -710,7 +728,7 @@ window.onload = function() {
     					sprite3.tl.fadeOut(10);
     				}
     			} else if (sub_timer == 240 && !g_max)  {
-                    gamelimit_timer += 15 - game.star_id;
+                    gamelimit_timer += 10 - game.star_id;
                     game.score += game_balance_tempo * 10;
                     game.popScene();
                 } else if ((sub_timer - 230) % 37 == 0 && g_max && sub_timer < 315 && sub_timer > 230) {
@@ -752,11 +770,17 @@ window.onload = function() {
                     gamelimit_timer += (25 + game.star_id * 10)
                     game.star_id += 1;
                     game.score += game.star_id * 1000;
+                    game.popScene();
                     // 進行度に応じて処理
                     if (game.star_id == 4) {
                         change_background_flag = true;
+                    } else if (game.star_id >= STARS.length) {
+                        if (bgm) {
+                            bgm.stop();
+                        }
+                        game.end(game.score, "GAME ALL CLEAR!");
                     }
-    				game.popScene();
+    				
     			}
 
     			sub_timer++;
@@ -838,8 +862,31 @@ window.onload = function() {
     			if (call_gameend > 0) {
     				call_gameend--;
     				if (call_gameend == 0) {
-                        console.log("END");
-    					game.end(game.score, "初級:火星への到達");
+                        var msg;
+                        switch(game.star_id) {
+                            case 0:
+                                msg = "打ち上げ失敗";
+                                break;
+                            case 1:
+                                msg = "地球は無慈悲なゴミの廃棄者";
+                                break;
+                            case 2:
+                                msg = "火星への到達";
+                                break;
+                            case 3:
+                                msg = "木星捨てます";
+                                break;
+                            case 4:
+                                msg = "燃える彗星";
+                                break;
+                            case 5:
+                                msg = "Spiderβへの到達";
+                                break;
+                            case 6:
+                                msg = "アルファ・ケンタウリへの到達 Don't PANIC!";
+                                break;
+                        }
+    					game.end(game.score, msg);
     				}
     			}
     			sub_timer++;
