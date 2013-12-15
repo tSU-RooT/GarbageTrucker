@@ -4,7 +4,7 @@ enchant();
 // 定数の定義
 var UNIT_SPEED_ON_STAGE = 2;
 var ADD_TIMING = [11, 22, 34, 0];
-var STARS = ["Moon", "Mars", "Spiderβ"];
+var STARS = ["Moon", "Mars", "Jupiter", "Comet","Spiderβ"];
 var USER_AGENT = window.navigator.userAgent.toLowerCase();
 
 // クラス、関数の定義
@@ -204,6 +204,7 @@ window.onload = function() {
     game.preload('img/stage.png');
     game.preload('img/rockets.png');
     game.preload('img/background.png');
+    game.preload('img/background2.png');
     game.preload('img/earth_.png');
     game.preload('img/window.png');
     game.preload('img/rocket_mini.png');
@@ -218,9 +219,9 @@ window.onload = function() {
     game.fps = 15 * 2;
     //game.scale = 6;
     game.star = "moon"
-    game.star_id = 2;//0
-    game.score = 123456//0;
-    game.star_garbage = 2;//0;
+    game.star_id = 0;
+    game.score = 0;
+    game.star_garbage = 0;//0;
 
     game.preload(['sounds/bgm.mp3', 'sounds/button09.mp3', 'sounds/fire01.wav', 'sounds/fire02.mp3', 'sounds/decide4.wav', 'sounds/beep11.wav',
                   'sounds/cursor31.wav', 'sounds/crash10.wav', 'sounds/beep05.wav', 'sounds/pyoro58.wav']);
@@ -272,6 +273,12 @@ window.onload = function() {
     			this.speed_y *= -1;
     			this.speed_y -= 0.25;
     		}
+            if (change_background_flag) {
+                change_background_flag = false;
+                this.speed_x = -1;
+                this.speed_y = -2;
+                this.image = game.assets['img/background2.png'];
+            }
     	};
     	game.rootScene.addChild(background_sprite);
     	// ステージ
@@ -304,7 +311,7 @@ window.onload = function() {
     		
     		game.rootScene.addChild(gametimer_sprites[i]);
     	}
-    	var gamelimit_timer = 98;//98;
+    	var gamelimit_timer = 55;//98;
     	updateLimitTimer();
     	// -----------------------------------------------------------------------
     	// 初期化
@@ -334,13 +341,15 @@ window.onload = function() {
         }
     	// メイン処理使用変数の初期化
     	var main_timer = 1;
-    	var game_barance_tempo = 0;
+    	var game_balance_tempo = 0;
     	var units = new Array();
     	var unit_count = 0;
-    	var call_trashscene = 0;
+    	var call_garbagescene = 0;
     	var call_gamescore_scene = 0;
     	var garbage_quantity = 0;
+        var garbage_rocket_color_id = 0;
     	var alert_show_flag = false;
+        var change_background_flag = false;
     	addUnit(1, 1);
     	var each_frame_event = function() {
     		// メイン処理
@@ -371,35 +380,59 @@ window.onload = function() {
     		  22.5度動くたびに判定を行いたい
     		  (度)    22, 44, 68, 90
     		  (Flame) 11. 22, 34, 45 
+              1.5秒当たり4回の投入判定
+              4分の1で投入するなら、1.5秒でひとつ入る
     		*/
 
     		if (ADD_TIMING.indexOf(main_timer % 45) > -1 && call_gamescore_scene == 0) {
-    			
+    			// ユニットの投入バランスの考慮
+                /*
+                    ----------------------------
+                    バランス考慮として初期は赤しか投入しない、
+                    最初の打ち上げ後2色目を投入
+                    さらに1目標達成後3色目とする。
 
-    			if (1) {
-
-    				// ユニットの投入バランスの考慮
-    				/*
-						----------------------------
-						バランス考慮として初期は赤しか投入しない、
-						最初の打ち上げ後2色目を投入
-						さらに1目標達成後3色目とする。
-						----------------------------
-    				*/
-    				// まず投入可能方向を取得する。
-    				var can_dir = getCanInsertDirection();
-    				if (rand(4) == 0 && can_dir.length > 0) {
-    					addUnit(can_dir[rand(can_dir.length)], 1)
-    				}
+                    ----------------------------
+                    */
+                // まず投入可能方向を取得する。
+                var can_dir = getCanInsertDirection();
+    			if (can_dir.length > 0) {
     				
-    				if (game_barance_tempo == 0) {
-    					if (unit_count <= 5){
-    						
-    					}
-    				} else {
-
-    				}
-    				var sum_cap = 0;
+    				/*if (rand(4) == 0 && can_dir.length > 0) {
+    					addUnit(can_dir[rand(can_dir.length)], 1)
+    				}*/
+    				
+    				if (game_balance_tempo == 0) {
+    					if (unit_count <= 12){
+                            if (rand(6) == 0 && main_timer >= game.fps * 3.5) {
+                                addUnit(can_dir[rand(can_dir.length)], 1)
+                            }
+    					} else if (rand(5) == 0){
+                            addUnit(can_dir[rand(can_dir.length)], 1)
+                        }
+    				} else if (game_balance_tempo >= 1 && game_balance_tempo <= 4) {
+                        if (units.length < 4) {
+                            if (rand(4) == 0) {
+                                var RATIO = [1, 1, 2];
+                                addUnit(can_dir[rand(can_dir.length)], RATIO[rand(RATIO.length)]);
+                            }
+                        } else {
+                            if (rand(5) == 0) {
+                                var RATIO = [1, 2, 2];
+                                addUnit(can_dir[rand(can_dir.length)], RATIO[rand(RATIO.length)]);
+                            }
+                        }
+    				} else if (game_balance_tempo >= 5 && game_balance_tempo <= 7) {
+                        if (rand(4) == 0) {
+                            var RATIO = [1, 1, 2, 2, 2];
+                            addUnit(can_dir[rand(can_dir.length)], RATIO[rand(RATIO.length)]);
+                        }
+                    } else if (game_balance_tempo >= 8 && game_balance_tempo <= 15) {
+                        if (rand(4) == 0) {
+                            var RATIO = [1, 1, 1, 2, 2, 3, 3];
+                            addUnit(can_dir[rand(can_dir.length)], RATIO[rand(RATIO.length)]);
+                        }
+                    }
 
 
     			}
@@ -413,10 +446,10 @@ window.onload = function() {
     				}
     			
     		}	
-    		if (call_trashscene > 0) {
-    				call_trashscene--;
-    				if (call_trashscene == 0 && call_gamescore_scene == 0) {
-    					showTrashScene();
+    		if (call_garbagescene > 0) {
+    				call_garbagescene--;
+    				if (call_garbagescene == 0 && call_gamescore_scene == 0) {
+    					showGarbageScene(garbage_rocket_color_id);
     				}
     			
     		}
@@ -461,18 +494,21 @@ window.onload = function() {
     		if (r.color_id == 0) {
     			r.color_id = color_id;
     			r.capacity = 1;
+                game.score += 2;
     			sound_play(plus_se, true)
     		} else {
     			if (r.color_id == color_id) {
-    				r.capacity += 1;
-    				if (r.capacity >= 9) { //10
+    				r.capacity += 2;
+                    game.score += 1;
+    				if (r.capacity >= 8) {
     					sound_play(plus2_se, true)
-    					if (call_trashscene > 0) {
-    						call_trashscene = 25;
+    					if (call_garbagescene > 0) {
+    						call_garbagescene = 25;
     						garbage_quantity += 1;
     					} else {
-    						call_trashscene = 25;
+    						call_garbagescene = 25;
     						garbage_quantity = 1;
+                            garbage_rocket_color_id = r.color_id;
     					}
 
     					r.fade = true;
@@ -482,19 +518,21 @@ window.onload = function() {
     					r.color_id = 0;
     					r.tl.scaleTo(0.1, 10, 8).and().fadeOut(8).then(function() {r.fade = false;}).scaleTo(1,1,1);
     				} else {
-    					sound_play(plus2_se, true);
+    					sound_play(plus_se, true);
     				}
     			} else {
     				r.capacity -= 1;
     				if (r.capacity <= 0) {
     					r.capacity = 0;
+                        r.color_id = 0;
+                        r.tl.fadeOut(5);
     				}
     			}
     			
     		}
 
     	}
-    	function showTrashScene(color_id) {
+    	function showGarbageScene(color_id) {
     		game.pushScene(new Scene());
     		var sprite1 = new Sprite(220, 220);
     		var sprite2 = new Sprite(220, 220);
@@ -503,10 +541,11 @@ window.onload = function() {
     		sprite1.x = sprite2.x = 50;
     		sprite1.y = sprite2.y = 50;
     		sprite3.x = 160 - im.width / 2;
-    		sprite3.y = 45;
+    		sprite3.y = 60;
     		sprite1.opacity = sprite2.opacity = sprite3.opacity = 0;
     		var mini_rocket_sprite = new Sprite(16, 24);
     		mini_rocket_sprite.opacity = 0;
+            mini_rocket_sprite.frame = color_id - 1;
     		sprite1.image = game.assets['img/window.png'];
     		sprite2.image = game.assets['img/earth_.png'];
     		sprite3.image = im;
@@ -518,11 +557,16 @@ window.onload = function() {
     		sprite1.tl.fadeIn(12);
     		sprite2.tl.fadeIn(12);
     		sprite3.tl.fadeIn(12);
+            // 変数宣言
     		var sub_timer = 1;
     		var explode;
     		var garbages;
     		var label1;
     		var label2;
+            var g_max = false;
+            // ゲームバランス更新処理
+            game_balance_tempo += 1;
+            // フレーム処理
     		game.currentScene.addEventListener('enterframe', function() {
     			if (sub_timer == 35) {
     				mini_rocket_sprite.opacity = 1;
@@ -536,15 +580,18 @@ window.onload = function() {
     				// 46フレームで120pixel上に動かす
     				// ∫(-ax^2 + bx)dx = 120 → a = 0.0074074
     				// f'(x) = -2ax + b && f'(23) = 0 → b = 46a
-    			} else if (sub_timer == 100) {
+    			} else if (sub_timer == 81) {
+                    mini_rocket_sprite.opacity = 0;
+                } else if (sub_timer == 100) {
     				label1 = new Label();
+
     				if (alert_show_flag) {
     					sub_timer = 229;
     				} else {
     					alert_show_flag = true;
     					label1.color = "#ffffff";
     					label1.font = "13px sans-serif";
-    					label1.text = ">garbage.emit(" + game.star +")";
+    					label1.text = ">garbage.emit(" + STARS[game.star_id] +")";
     					label1.x = 60;
     					label1.y = 135;
     					var sound = function() {sound_play(cursor_se);};
@@ -563,30 +610,73 @@ window.onload = function() {
     				*/
     				mini_rocket_sprite.opacity = 0;
     				game.star_garbage += garbage_quantity; // ゴミを足す
+                    if (game.star_id == 0 && game.star_garbage >= 3) {
+                        g_max = true;
+                    } else if (game.star_garbage >= 5){
+                        g_max = true;
+                    }
+
     				garbage_quantity = 0;
     				garbages = [];
-    				for (var i=0;i<3;i++) {
+    				for (var i=0;i<10;i++) {
     					garbages[i] = new Sprite(8, 8);
     					garbages[i].image = game.assets['img/garbage.png'];
     					garbages[i].opacity = 0;
     					game.currentScene.addChild(garbages[i]);
     				}
     				
-    				garbages[0].moveTo(96 + 50, 18 + 70);
-    				garbages[1].moveTo(118 + 50, 25 + 70);
-    				garbages[2].moveTo(109 + 50, 41 + 70);
+    				garbages[0].moveTo(160 - 7, 14 + 50);
+    				garbages[1].moveTo(160 + 7, 20 + 50);
+    				garbages[2].moveTo(160 - 16, 26 + 50);
+                    garbages[3].moveTo(160 + 9, 32 + 50);
+                    garbages[4].moveTo(160 - 22, 38 + 50);
+                    garbages[5].moveTo(160 - 2, 44 + 50);
+                    garbages[6].moveTo(160 + 14, 50 + 50);
+                    garbages[7].moveTo(160 - 12, 56 + 50);
+                    garbages[8].moveTo(160 + 2, 59 + 50);
+                    garbages[9].moveTo(160 - 3, 57 + 50);
     				sound_play(garbage_se);
-    				garbages[0].tl.fadeIn(20);
-    				if (game.star_garbage >= 2) {
-    					garbages[1].tl.delay(5).fadeIn(20);
-    				}
-    				if (game.star_garbage >= 3) {
-    					garbages[2].tl.delay(10).fadeIn(20);
+    				
+                    if (game.star_id > 0) {
+                        switch(game.star_garbage) {
+                            case 5:
+                                garbages[8].tl.delay(20).fadeIn(20);
+                                garbages[9].tl.delay(20).fadeIn(20);
+                            case 4:
+                                garbages[6].tl.delay(15).fadeIn(20);
+                                garbages[7].tl.delay(15).fadeIn(20);
+                            case 3:
+                                garbages[4].tl.delay(10).fadeIn(20);
+                                garbages[5].tl.delay(10).fadeIn(20);
+                            case 2:
+                                garbages[2].tl.delay(5).fadeIn(20);
+                                garbages[3].tl.delay(5).fadeIn(20);
+                            case 1:
+                                garbages[0].tl.fadeIn(20);
+                                garbages[1].tl.fadeIn(20);
 
-    				}
+                        }
+                    } else {
+                        switch(game.star_garbage) {
+                            case 3:
+                                garbages[6].tl.delay(10).fadeIn(20);
+                                garbages[8].tl.delay(10).fadeIn(20);
+                            case 2:
+                                garbages[3].tl.delay(5).fadeIn(20);
+                                garbages[4].tl.delay(5).fadeIn(20);
+                            case 1:
+                                garbages[0].tl.fadeIn(20);
+                                garbages[2].tl.fadeIn(20);
+
+                        }
+                    }
+
+
+    				
 
     			} else if (sub_timer == 300) {
-    				if (game.star_garbage >= 3) {
+
+    				if (g_max) {
     					// ラベルの再表示
     					label1.text = ">Star's capacity is FULL."
     					label1.x = 60;
@@ -607,26 +697,30 @@ window.onload = function() {
 
     					*/
     				} else {
-    					for (var i=0;i<3;i++) {
+    					for (var i=0;i<garbages.length;i++) {
     					  garbages[i].tl.fadeOut(10);
     					}
     					sprite1.tl.fadeOut(10);
     					sprite2.tl.fadeOut(10);
     					sprite3.tl.fadeOut(10);
     				}
-    			} else if ((sub_timer - 300) % 37 == 0 && game.star_garbage >= 3 && sub_timer < 385 && sub_timer > 300) {
+    			} else if (sub_timer == 315 && !g_max)  {
+                    gamelimit_timer += 20 - game.star_id;
+                    game.score += game_balance_tempo * 10;
+                    game.popScene();
+                } else if ((sub_timer - 300) % 37 == 0 && g_max && sub_timer < 385 && sub_timer > 300) {
     				sound_play(beep_se);
-    			} else if (sub_timer == 385 && game.star_garbage >= 3) {
+    			} else if (sub_timer == 385 && g_max) {
     				// ラベルの消去
     				label1.tl.unloop();
     				label1.tl.removeFromScene();
     				label2.tl.unloop();
     				label2.tl.removeFromScene();
 
-    			} else if(sub_timer == 410 && game.star_garbage >= 3) {
+    			} else if(sub_timer == 410 && g_max) {
     				// 星の爆破
     				sound_play(fire2_se);
-    				for (var i=0;i<3;i++) {
+    				for (var i=0;i<garbages.length;i++) {
     				  garbages[i].opacity = 0;
     				}
    					sprite3.tl.delay(10).fadeOut(15);
@@ -638,18 +732,25 @@ window.onload = function() {
     				explode.opacity = 0.8
     				explode.tl.scaleTo(2, 2, 30);
     				game.currentScene.addChild(explode);
-    			} else if (sub_timer > 410 && sub_timer <= 410 + 30 && game.star_garbage >= 3) {
+    			} else if (sub_timer > 410 && sub_timer <= 410 + 30 && g_max) {
     				explode.frame += 1;
     			} else if (sub_timer == 441) {
-    				if (game.star_garbage >= 3) {
+    				if (g_max) {
     					explode.tl.fadeOut(5);
-    				} else {
-    					game.popScene();
     				}
     			} else if (sub_timer == 460) {
     				sprite1.tl.fadeOut(10);
     				sprite2.tl.fadeOut(10);
-    			} else if (sub_timer == 470) {
+    			} else if (sub_timer == 470 && g_max) {
+                    // 加算処理
+                    game.star_garbage = 0;
+                    gamelimit_timer += (45 + game.star_id * 10)
+                    game.star_id += 1;
+                    game.score += game.star_id * 1000;
+                    // 進行度に応じて処理
+                    if (game.star_id == 4) {
+                        change_background_flag = true;
+                    }
     				game.popScene();
     			}
 
@@ -666,14 +767,14 @@ window.onload = function() {
 
     		back_sprite.image = game.assets["img/black.png"];
     		back_sprite.opacity = 0;
-    		back_sprite.tl.fadeTo(1, 50);
+    		back_sprite.tl.fadeTo(0.75, 50);
     		game.currentScene.addChild(back_sprite);
     		var sub_timer = 1;
     		var s_index = 0;
     		var showed_star = false;
     		var label1;
     		var label2;
-    		var add_delta = parseInt(game.score / (game.fps * 2.5))
+    		var add_delta = parseInt(game.score / (game.fps * 2.5)) + 1;
     		var call_gameend = 0;
     		game.currentScene.addEventListener('enterframe', function() {
     			if (sub_timer == 80) {
@@ -698,21 +799,19 @@ window.onload = function() {
     					var sp = new Sprite(im.width, im.height);
     					sp.image = im;
     					sp.opacity = 0;
-    					sp.originX = im.width / 2;
-    					sp.originY = im.height / 2;
     					sp.scale(3, 3);
-    					game.currentScene.addChild(sp);
     					star_sprites.push(sp);
     					if (s_index == 5) {
-    						sp.moveTo(-80 ,190 - im.height / 2 + 55 + 5);
+    						sp.moveTo(10 ,140 - im.height / 2 + 55 + 5);
     					} else if (s_index > 0) {
     						var sp2 = star_sprites[s_index - 1];
-    						sp.x = sp2.x + 55 + 5;
-    						sp.y = 190 - im.height / 2 + (60 * parseInt(s_index / 5));
+    						sp.x = sp2.x + ~~(sp2.image.width * 0.8);
+    						sp.y = 140 - im.height / 2 + (60 * ~~(s_index / 5));
     					} else {
-    						sp.moveTo(-80 ,190 - im.height / 2);
+    						sp.moveTo(10 ,140 - im.height / 2);
     					}
-    					sp.tl.fadeIn(20).and().scaleTo(0.6, 0.6, 20);
+    					sp.tl.fadeIn(20).and().scaleTo(0.8, 0.8, 20);
+                        game.currentScene.addChild(sp);
     					sound_play(show_se, true);
     					s_index++;
     				} else {
@@ -722,13 +821,14 @@ window.onload = function() {
     			} else if (showed_star) {
     				if (label2.num < game.score) {
     					label2.num += add_delta;
-    					if (label2.num > game.score) {
-    						label2.num = game.score;
-                            call_gameend = 60;
-    					}
-    					label2.text = String(label2.num);
     				}
-    				
+    				if (label2.num >= game.score) {
+                        label2.num = game.score;
+                        if (call_gameend == 0) {
+                            call_gameend = 60;
+                        }
+                    }
+                    label2.text = String(label2.num);
     			}
     			if (call_gameend > 0) {
     				call_gameend--;
@@ -763,7 +863,7 @@ window.onload = function() {
     	}
 
     	function getCanInsertDirection() {
-    		if (units.length > 6 * 3) {
+    		if (units.length > 6) {
     			return [];
     		}
     		var foo = [true, true, true, true]
