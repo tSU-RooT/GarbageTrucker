@@ -216,7 +216,7 @@ window.onload = function() {
     for (var i = 0;i<STARS.length;i++) {
     	game.preload("img/" + STARS[i] + ".png");
     }
-    game.fps = 15 * 2;
+    game.fps = 30;
     //game.scale = 6;
     game.star = "moon"
     game.star_id = 0;
@@ -264,14 +264,14 @@ window.onload = function() {
     		}
     		if (this.x >= 0) {
     			this.speed_x *= -1;
-    			this.speed_x -= 0.25;
+    			this.speed_x -= 0.1;
     		}
     		if (this.y <= -320) {
     			this.speed_y *= -1;
     		}
     		if (this.y >= 0) {
     			this.speed_y *= -1;
-    			this.speed_y -= 0.25;
+    			this.speed_y -= 0.1;
     		}
             if (change_background_flag) {
                 change_background_flag = false;
@@ -311,7 +311,7 @@ window.onload = function() {
     		
     		game.rootScene.addChild(gametimer_sprites[i]);
     	}
-    	var gamelimit_timer = 55;//98;
+    	var gamelimit_timer = 70;//98;
     	updateLimitTimer();
     	// -----------------------------------------------------------------------
     	// 初期化
@@ -427,7 +427,7 @@ window.onload = function() {
                             var RATIO = [1, 1, 2, 2, 2];
                             addUnit(can_dir[rand(can_dir.length)], RATIO[rand(RATIO.length)]);
                         }
-                    } else if (game_balance_tempo >= 8 && game_balance_tempo <= 15) {
+                    } else if (game_balance_tempo >= 8 && game_balance_tempo <= 20) {
                         if (rand(4) == 0) {
                             var RATIO = [1, 1, 1, 2, 2, 3, 3];
                             addUnit(can_dir[rand(can_dir.length)], RATIO[rand(RATIO.length)]);
@@ -521,7 +521,12 @@ window.onload = function() {
     					sound_play(plus_se, true);
     				}
     			} else {
-    				r.capacity -= 1;
+                    // 適当な操作で発射しないよう、調整
+                    if (r.capacity >= 7) {
+                        r.capacity -= 2;
+                    } else {
+                        r.capacity -= 1;
+                    }
     				if (r.capacity <= 0) {
     					r.capacity = 0;
                         r.color_id = 0;
@@ -568,25 +573,25 @@ window.onload = function() {
             game_balance_tempo += 1;
             // フレーム処理
     		game.currentScene.addEventListener('enterframe', function() {
-    			if (sub_timer == 35) {
+    			if (sub_timer == 20) {
     				mini_rocket_sprite.opacity = 1;
     				mini_rocket_sprite.x = 160 - 8;
     				mini_rocket_sprite.y = 50 + 144
     				sound_play(fire_se);
     			}
-    			if (sub_timer > 35 && sub_timer <= 35 + 45) {
-    				var t = sub_timer - 35;
+    			if (sub_timer > 20 && sub_timer <= 20 + 45) {
+    				var t = sub_timer - 20;
     				mini_rocket_sprite.y -= (-0.0074074 * t * t) + (0.3407407 * t);
     				// 46フレームで120pixel上に動かす
     				// ∫(-ax^2 + bx)dx = 120 → a = 0.0074074
     				// f'(x) = -2ax + b && f'(23) = 0 → b = 46a
-    			} else if (sub_timer == 81) {
+    			} else if (sub_timer == 66) {
                     mini_rocket_sprite.opacity = 0;
-                } else if (sub_timer == 100) {
+                } else if (sub_timer == 70) {
     				label1 = new Label();
 
     				if (alert_show_flag) {
-    					sub_timer = 229;
+    					sub_timer = 199;
     				} else {
     					alert_show_flag = true;
     					label1.color = "#ffffff";
@@ -599,10 +604,10 @@ window.onload = function() {
     					game.currentScene.addChild(label1);
     				}
     				
-    			} else if (sub_timer == 188) {
+    			} else if (sub_timer == 158) {
     				label1.tl.unloop();
     				label1.tl.removeFromScene();
-    			} else if (sub_timer == 230) {
+    			} else if (sub_timer == 200) {
     				/*
     				  g1:(96, 18)
     				  g2:(118, 25)
@@ -640,17 +645,17 @@ window.onload = function() {
                     if (game.star_id > 0) {
                         switch(game.star_garbage) {
                             case 5:
-                                garbages[8].tl.delay(20).fadeIn(20);
-                                garbages[9].tl.delay(20).fadeIn(20);
+                                garbages[8].tl.fadeIn(20);
+                                garbages[9].tl.fadeIn(20);
                             case 4:
-                                garbages[6].tl.delay(15).fadeIn(20);
-                                garbages[7].tl.delay(15).fadeIn(20);
+                                garbages[6].tl.fadeIn(20);
+                                garbages[7].tl.fadeIn(20);
                             case 3:
-                                garbages[4].tl.delay(10).fadeIn(20);
-                                garbages[5].tl.delay(10).fadeIn(20);
+                                garbages[4].tl.fadeIn(20);
+                                garbages[5].tl.fadeIn(20);
                             case 2:
-                                garbages[2].tl.delay(5).fadeIn(20);
-                                garbages[3].tl.delay(5).fadeIn(20);
+                                garbages[2].tl.fadeIn(20);
+                                garbages[3].tl.fadeIn(20);
                             case 1:
                                 garbages[0].tl.fadeIn(20);
                                 garbages[1].tl.fadeIn(20);
@@ -659,11 +664,11 @@ window.onload = function() {
                     } else {
                         switch(game.star_garbage) {
                             case 3:
-                                garbages[6].tl.delay(10).fadeIn(20);
-                                garbages[8].tl.delay(10).fadeIn(20);
+                                garbages[6].tl.fadeIn(20);
+                                garbages[8].tl.fadeIn(20);
                             case 2:
-                                garbages[3].tl.delay(5).fadeIn(20);
-                                garbages[4].tl.delay(5).fadeIn(20);
+                                garbages[3].tl.fadeIn(20);
+                                garbages[4].tl.fadeIn(20);
                             case 1:
                                 garbages[0].tl.fadeIn(20);
                                 garbages[2].tl.fadeIn(20);
@@ -674,7 +679,7 @@ window.onload = function() {
 
     				
 
-    			} else if (sub_timer == 300) {
+    			} else if (sub_timer == 230) {
 
     				if (g_max) {
     					// ラベルの再表示
@@ -704,20 +709,20 @@ window.onload = function() {
     					sprite2.tl.fadeOut(10);
     					sprite3.tl.fadeOut(10);
     				}
-    			} else if (sub_timer == 315 && !g_max)  {
-                    gamelimit_timer += 20 - game.star_id;
+    			} else if (sub_timer == 240 && !g_max)  {
+                    gamelimit_timer += 15 - game.star_id;
                     game.score += game_balance_tempo * 10;
                     game.popScene();
-                } else if ((sub_timer - 300) % 37 == 0 && g_max && sub_timer < 385 && sub_timer > 300) {
+                } else if ((sub_timer - 230) % 37 == 0 && g_max && sub_timer < 315 && sub_timer > 230) {
     				sound_play(beep_se);
-    			} else if (sub_timer == 385 && g_max) {
+    			} else if (sub_timer == 315 && g_max) {
     				// ラベルの消去
     				label1.tl.unloop();
     				label1.tl.removeFromScene();
     				label2.tl.unloop();
     				label2.tl.removeFromScene();
 
-    			} else if(sub_timer == 410 && g_max) {
+    			} else if(sub_timer == 340 && g_max) {
     				// 星の爆破
     				sound_play(fire2_se);
     				for (var i=0;i<garbages.length;i++) {
@@ -732,19 +737,19 @@ window.onload = function() {
     				explode.opacity = 0.8
     				explode.tl.scaleTo(2, 2, 30);
     				game.currentScene.addChild(explode);
-    			} else if (sub_timer > 410 && sub_timer <= 410 + 30 && g_max) {
+    			} else if (sub_timer > 340 && sub_timer <= 340 + 30 && g_max) {
     				explode.frame += 1;
-    			} else if (sub_timer == 441) {
+    			} else if (sub_timer == 371) {
     				if (g_max) {
     					explode.tl.fadeOut(5);
     				}
-    			} else if (sub_timer == 460) {
+    			} else if (sub_timer == 391) {
     				sprite1.tl.fadeOut(10);
     				sprite2.tl.fadeOut(10);
-    			} else if (sub_timer == 470 && g_max) {
+    			} else if (sub_timer == 400 && g_max) {
                     // 加算処理
                     game.star_garbage = 0;
-                    gamelimit_timer += (45 + game.star_id * 10)
+                    gamelimit_timer += (25 + game.star_id * 10)
                     game.star_id += 1;
                     game.score += game.star_id * 1000;
                     // 進行度に応じて処理
