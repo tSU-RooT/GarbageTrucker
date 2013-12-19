@@ -219,9 +219,9 @@ window.onload = function() {
     game.fps = 30;
     //game.scale = 6;
     game.star = "moon"
-    game.star_id = 0;//0;
+    game.star_id = 4;//0;
     game.score = 0;
-    game.star_garbage = 0;//0;
+    game.star_garbage = 4;//0;
 
     game.preload(['sounds/bgm.mp3', 'sounds/button09.mp3', 'sounds/fire01.wav', 'sounds/fire02.mp3', 'sounds/decide4.wav', 'sounds/beep11.wav',
                   'sounds/cursor31.wav', 'sounds/crash10.wav', 'sounds/beep05.wav', 'sounds/pyoro58.wav']);
