@@ -420,15 +420,15 @@ window.onload = function() {
                     
                     if (game_balance_tempo == 0) {
                         if (unit_count <= 12){
-                            if (rand(6) == 0 && main_timer >= game.fps * 3.5) {
+                            if (rand(5) == 0 && main_timer >= game.fps * 3.5) {
                                 addUnit(can_dir[rand(can_dir.length)], 1)
                             }
-                        } else if (rand(10) <= 2){
+                        } else if (rand(10) <= 3){
                             addUnit(can_dir[rand(can_dir.length)], 1)
                         }
                     } else if (game_balance_tempo >= 1 && game_balance_tempo <= 4) {
                         if (units.length < 5) {
-                            if (rand(4) == 0) {
+                            if (rand(3) == 0) {
                                 var RATIO = [1, 1, 2];
                                 addUnit(can_dir[rand(can_dir.length)], RATIO[rand(RATIO.length)]);
                             }
@@ -439,28 +439,28 @@ window.onload = function() {
                             }
                         }
                     } else if (game_balance_tempo >= 5 && game_balance_tempo <= 7) {
-                        if (rand(4) == 0) {
+                        if (rand(3) == 0) {
                             var RATIO = [1, 1, 2, 2, 2];
                             addUnit(can_dir[rand(can_dir.length)], RATIO[rand(RATIO.length)]);
                         }
                     } else if (game_balance_tempo >= 8 && game_balance_tempo <= 12) {
-                        if (rand(3) == 0) {
+                        if (rand(10) <= 4) {
                             var RATIO = [1, 1, 1, 2, 2, 3, 3];
                             addUnit(can_dir[rand(can_dir.length)], RATIO[rand(RATIO.length)]);
                         }
                     } else if (game_balance_tempo >= 13 && game_balance_tempo <= 18) {
-                        if (rand(3) == 0) {
+                        if (rand(10) <= 4) {
                             var RATIO = [1, 2, 3];
                             addUnit(can_dir[rand(can_dir.length)], RATIO[rand(RATIO.length)]);
                         }
                     } else if (game_balance_tempo >= 19 && game_balance_tempo <= 28) {
                         if (game_balance_tempo % 2 == 0) {
-                            if (rand(5) <= 1) {
+                            if (rand(10) <= 4) {
                                 var RATIO = [1, 2, 3, 3, 4];
                                 addUnit(can_dir[rand(can_dir.length)], RATIO[rand(RATIO.length)]);
                             }
                         } else {
-                            if (rand(4) == 0) {
+                            if (rand(10) <= 3) {
                                 var RATIO = [1, 1, 2, 2, 3, 4];
                                 addUnit(can_dir[rand(can_dir.length)], RATIO[rand(RATIO.length)]);
                             }
