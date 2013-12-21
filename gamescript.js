@@ -220,7 +220,6 @@ window.onload = function() {
         game.preload("img/" + STARS[i] + ".png");
     }
     game.fps = 30;
-    game.scale = 4;
     game.star = "moon"
     game.star_id = 0;
     game.score = 0;
