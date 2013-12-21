@@ -220,13 +220,13 @@ window.onload = function() {
     game.fps = 30;
     //game.scale = 6;
     game.star = "moon"
-    game.star_id = 3;//0;
+    game.star_id = 0;//0;
     game.score = 0;
-    game.star_garbage = 4;//0;
+    game.star_garbage = 0;//0;
     game.unit_speed = UNIT_SPEED_ON_STAGE;
     game.difficult = false;
     game.preload(['sounds/bgm.mp3', 'sounds/button09.mp3', 'sounds/fire01.wav', 'sounds/fire02.mp3', 'sounds/decide4.wav', 'sounds/beep11.wav',
-                  'sounds/cursor31.wav', 'sounds/crash10.wav', 'sounds/beep05.wav', 'sounds/pyoro58.wav', 'sounds/mecha26.wav']);
+                  'sounds/cursor31.wav', 'sounds/crash10.wav', 'sounds/beep05.wav', 'sounds/pyoro58.wav', 'sounds/cancel5.wav']);
     var bgm;
     var plus_se;
     var fire_se;
@@ -248,7 +248,7 @@ window.onload = function() {
         cursor_se = game.assets['sounds/cursor31.wav'];
         show_se = game.assets['sounds/crash10.wav'];
         beep_se = game.assets['sounds/beep05.wav'];
-        down_se = game.assets['sounds/mecha26.wav'];
+        down_se = game.assets['sounds/cancel5.wav'];
         timedown_se = game.assets['sounds/pyoro58.wav'];
     }
 
@@ -608,7 +608,7 @@ window.onload = function() {
                         r.tl.fadeOut(5);
                         if (game.difficult) {
                             sound_play(down_se);
-                            gamelimit_timer -= 10;
+                            gamelimit_timer -= 5;
                         }
                     }
                 }
@@ -803,7 +803,7 @@ window.onload = function() {
                         sprite3.tl.fadeOut(10);
                     }
                 } else if (sub_timer == 240 && !g_max)  {
-                    gamelimit_timer += 10 - game.star_id;
+                    gamelimit_timer += 10;
                     game.score += game_balance_tempo * 10;
                     game.popScene();
                 } else if ((sub_timer - 230) % 37 == 0 && g_max && sub_timer < 315 && sub_timer > 230) {
