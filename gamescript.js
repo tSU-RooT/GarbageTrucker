@@ -218,15 +218,14 @@ window.onload = function() {
         game.preload("img/" + STARS[i] + ".png");
     }
     game.fps = 30;
-    //game.scale = 6;
     game.star = "moon"
-    game.star_id = 0;//0;
+    game.star_id = 0;
     game.score = 0;
-    game.star_garbage = 0;//0;
+    game.star_garbage = 0;
     game.unit_speed = UNIT_SPEED_ON_STAGE;
     game.difficult = false;
     game.preload(['sounds/bgm.mp3', 'sounds/button09.mp3', 'sounds/fire01.wav', 'sounds/fire02.mp3', 'sounds/decide4.wav', 'sounds/beep11.wav',
-                  'sounds/cursor31.wav', 'sounds/crash10.wav', 'sounds/beep05.wav', 'sounds/pyoro58.wav', 'sounds/cancel5.wav']);
+                  'sounds/cursor31.wav', 'sounds/crash10.wav', 'sounds/beep05.wav', 'sounds/pyoro58.wav', 'sounds/cancel5.wav', 'sounds/clear2.mp3']);
     var bgm;
     var plus_se;
     var fire_se;
@@ -238,6 +237,7 @@ window.onload = function() {
     var beep_se;
     var timedown_se;
     var down_se;
+    var gameclear_se;
     function soundset() {
         bgm = game.assets["sounds/bgm.mp3"];
         plus_se = game.assets["sounds/button09.mp3"];
@@ -250,6 +250,7 @@ window.onload = function() {
         beep_se = game.assets['sounds/beep05.wav'];
         down_se = game.assets['sounds/cancel5.wav'];
         timedown_se = game.assets['sounds/pyoro58.wav'];
+        gameclear_se = game.assets['sounds/clear2.mp3'];
     }
 
     var game_main_process = function() {
@@ -722,9 +723,9 @@ window.onload = function() {
                     garbages[4].moveTo(160 - 22, 38 + 50);
                     garbages[5].moveTo(160 - 2, 44 + 50);
                     garbages[6].moveTo(160 + 14, 50 + 50);
-                    garbages[7].moveTo(160 - 12, 56 + 50);
+                    garbages[7].moveTo(160 - 16, 54 + 50);
                     garbages[8].moveTo(160 + 8, 59 + 50);
-                    garbages[9].moveTo(160 , 57 + 50);
+                    garbages[9].moveTo(160 - 4, 57 + 50);
                     sound_play(garbage_se);
                     
                     if (game.star_id > 0) {
@@ -776,6 +777,8 @@ window.onload = function() {
 
                     if (g_max) {
                         // ラベルの再表示
+                        label1.color = "#ffffff";
+                        label1.font = "13px sans-serif";
                         label1.text = ">Star's capacity is FULL."
                         label1.x = 60;
                         label1.y = 135;
@@ -845,7 +848,7 @@ window.onload = function() {
                     if (game.star_id >= 4) {
                         gamelimit_timer += 35;
                     } else {
-                        gamelimit_timer += (25 + game.star_id * 15)
+                        gamelimit_timer += (15 + game.star_id * 10)
                     }
                     game.star_id += 1;
                     game.score += game.star_id * 1000;
@@ -931,6 +934,9 @@ window.onload = function() {
                     } else {
                         label2.tl.fadeIn(15);
                         showed_star = true;
+                        if (game.star_id == 8) {
+                            sound_play(gameclear_se);
+                        }
                     }
                 } else if (showed_star) {
                     if (label2.num < game.score) {
@@ -950,32 +956,30 @@ window.onload = function() {
                         var msg;
                         switch(game.star_id) {
                             case 0:
-                                msg = "到達:地球";
-                                break;
-                            case 1:
                                 msg = "到達:月";
                                 break;
-                            case 2:
+                            case 1:
                                 msg = "到達:火星";
                                 break;
-                            case 3:
+                            case 2:
                                 msg = "到達:木星";
                                 break;
-                            case 4:
+                            case 3:
                                 msg = "到達:土星";
                                 break;
-                            case 5:
+                            case 4:
                                 msg = "到達:彗星";
                                 break;
-                            case 6:
+                            case 5:
                                 msg = "到達:Spiderβ";
                                 break;
-                            case 7:
+                            case 6:
                                 msg = "到達:アルファ・ケンタウリ";
                                 break;
-                            case 8:
+                            case 7:
                                 msg = "到達:シリウス星";
-                            case 9:
+                                break;
+                            case 8:
                                 msg = "GAME ALL CLEAR!"
                         }
                         game.end(game.score, msg);
