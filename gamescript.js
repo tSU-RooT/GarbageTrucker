@@ -184,14 +184,16 @@ function pressSpaceKey() {
 function rand(max) {
     return Math.floor(Math.random() * max);
 }
-function sound_play(audio, overlap) {
+function sound_play(audio, overlap, volume) {
     if (soundon && audio) {
         if (overlap) {
             audio.clone().play();
         } else {
             audio.play();
         }
-        
+        if (volume) {
+            audio.volume = volume;
+        }
     }
 }
 
@@ -218,6 +220,7 @@ window.onload = function() {
         game.preload("img/" + STARS[i] + ".png");
     }
     game.fps = 30;
+    game.scale = 4;
     game.star = "moon"
     game.star_id = 0;
     game.score = 0;
@@ -414,9 +417,7 @@ window.onload = function() {
                 var can_dir = getCanInsertDirection();
                 if (can_dir.length > 0) {
                     
-                    /*if (rand(4) == 0 && can_dir.length > 0) {
-                        addUnit(can_dir[rand(can_dir.length)], 1)
-                    }*/
+                    
                     
                     if (game_balance_tempo == 0) {
                         if (unit_count <= 12){
@@ -507,7 +508,7 @@ window.onload = function() {
             if (call_gamescore_scene > 0) {
                     call_gamescore_scene--;
                     if (bgm) {
-                        bgm.volume -= 0.015;
+                        bgm.volume -= 0.013;
                     }
                     if (call_gamescore_scene == 0) {
                         showScoreScene();
@@ -523,7 +524,7 @@ window.onload = function() {
             }
 
             //  中央タイマー処理
-            if (main_timer % (game.fps) == 0) {
+            if (main_timer % (game.fps) == 0 && call_gamescore_scene == 0) {
                 
                 gamelimit_timer--;
                 
@@ -532,12 +533,12 @@ window.onload = function() {
             if (bgm) {
                 // BGM 2秒目に演奏を開始する。
                 if (main_timer == game.fps * 2) {
-                    sound_play(bgm);
+                    sound_play(bgm, false, 0.7);
                 }
                 // 演奏終了していたら再演奏する
                 if (bgm.currentTime >= bgm.duration && main_timer > game.fps * 3) {
                     bgm.stop();
-                    sound_play(bgm);
+                    sound_play(bgm, false, 0.7);
 
                 }
             }
@@ -770,9 +771,6 @@ window.onload = function() {
                         }
                     }
 
-
-                    
-
                 } else if (sub_timer == 230) {
 
                     if (g_max) {
@@ -806,7 +804,7 @@ window.onload = function() {
                         sprite3.tl.fadeOut(10);
                     }
                 } else if (sub_timer == 240 && !g_max)  {
-                    gamelimit_timer += 10;
+                    gamelimit_timer += 10 * garbage_quantity;
                     game.score += game_balance_tempo * 10;
                     game.popScene();
                 } else if ((sub_timer - 230) % 37 == 0 && g_max && sub_timer < 315 && sub_timer > 230) {
@@ -830,7 +828,7 @@ window.onload = function() {
                     explode.image = game.assets['img/explode.png'];                     
                     explode.moveTo(160 - 32, 50 + 10);
                     explode.scale(1.6, 1.6);
-                    explode.opacity = 0.8
+                    explode.opacity = 0.8;
                     explode.tl.scaleTo(2, 2, 30);
                     game.currentScene.addChild(explode);
                 } else if (sub_timer > 340 && sub_timer <= 340 + 30 && g_max) {
@@ -846,9 +844,9 @@ window.onload = function() {
                     // 加算処理
                     game.star_garbage = 0;
                     if (game.star_id >= 4) {
-                        gamelimit_timer += 35;
+                        gamelimit_timer += 50;
                     } else {
-                        gamelimit_timer += (15 + game.star_id * 10)
+                        gamelimit_timer += (20 + game.star_id * 10)
                     }
                     game.star_id += 1;
                     game.score += game.star_id * 1000;
@@ -856,8 +854,9 @@ window.onload = function() {
                     // 進行度に応じて処理
                     if (game.star_id == 4) {
                         change_background_flag = true;
-                        change_unit_speed_flag = true;
                         game.difficult = true;
+                    } else if (game.star_id == 6) {
+                        change_unit_speed_flag = true;
                     } else if (game.star_id >= STARS.length) {
                         if (bgm) {
                             bgm.stop();
@@ -1003,7 +1002,7 @@ window.onload = function() {
                 }
                 sound_play(timedown_se);
             }
-            if (gamelimit_timer == 0) {
+            if (gamelimit_timer <= 0 && call_gamescore_scene == 0) {
                 call_gamescore_scene = 50;
                 for(var i=0;i<units.length;i++) {
                     units[i].tl.delay(10).fadeOut(35);
