@@ -319,7 +319,7 @@ window.onload = function() {
             gametimer_sprites[i].tl.fadeIn(90);
             game.rootScene.addChild(gametimer_sprites[i]);
         }
-        var gamelimit_timer = 65;//98;
+        var gamelimit_timer = 85;//98;
         updateLimitTimer();
         // -----------------------------------------------------------------------
         // 初期化
@@ -843,9 +843,9 @@ window.onload = function() {
                     // 加算処理
                     game.star_garbage = 0;
                     if (game.star_id >= 4) {
-                        gamelimit_timer += 50;
+                        gamelimit_timer += 60;
                     } else {
-                        gamelimit_timer += (20 + game.star_id * 10)
+                        gamelimit_timer += (40 + game.star_id * 10)
                     }
                     game.star_id += 1;
                     game.score += game.star_id * 1000;
