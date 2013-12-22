@@ -131,6 +131,7 @@ function Rocket_Sprite(di_i, color_i) {
     this.opacity = 0.75;
     this.fade = false;
     this.frame = (color_i - 1) * 10;
+    this.half = false;
     if (di_i<= 0 || di_i > 4) {
         throw new Error("direction_idの指定が不正です。", "gamescript.js", 57);
     }
@@ -367,7 +368,7 @@ window.onload = function() {
                 if (units[i].can_dispose >= 1) {
                     addPoint(units[i].can_dispose, units[i].color_id);
                     units[i].tl.removeFromScene();
-                    units.splice(i, 1);
+                    units.splice(i, 1);Ï
                     i--;
                     
                     continue;
@@ -574,6 +575,9 @@ window.onload = function() {
                 if (r.color_id == color_id) {
                     r.capacity += 2;
                     game.score += 1;
+                    if (r.capacity >= 5) {
+                        r.half = true;
+                    }
                     if (r.capacity >= 8) {
                         sound_play(plus2_se, true)
                         if (call_garbagescene > 0) {
@@ -592,6 +596,7 @@ window.onload = function() {
                         // reset
                         r.capacity = 0;
                         r.color_id = 0;
+                        r.half = false;
                         r.tl.scaleTo(0.1, 10, 8).and().fadeOut(8).then(function() {r.fade = false;}).scaleTo(1,1,1);
                     } else {
                         sound_play(plus_se, true);
@@ -607,10 +612,11 @@ window.onload = function() {
                         r.capacity = 0;
                         r.color_id = 0;
                         r.tl.fadeOut(5);
-                        if (game.difficult) {
+                        if (game.difficult && r.half)  {
                             sound_play(down_se);
                             gamelimit_timer -= 5;
                         }
+                        r.half = false;
                     }
                 }
                 
