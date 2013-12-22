@@ -614,7 +614,7 @@ window.onload = function() {
                         r.tl.fadeOut(5);
                         if (game.difficult && r.half)  {
                             sound_play(down_se);
-                            gamelimit_timer -= 5;
+                            gamelimit_timer -= 10;
                         }
                         r.half = false;
                     }
