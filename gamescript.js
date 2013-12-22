@@ -803,7 +803,11 @@ window.onload = function() {
                         sprite3.tl.fadeOut(10);
                     }
                 } else if (sub_timer == 240 && !g_max)  {
-                    gamelimit_timer += 10 * garbage_quantity;
+                    if (game.difficult) {
+                        gamelimit_timer += 10 * garbage_quantity;
+                    } else {
+                        gamelimit_timer += 15 * garbage_quantity;
+                    }
                     game.score += game_balance_tempo * 10;
                     game.popScene();
                 } else if ((sub_timer - 230) % 37 == 0 && g_max && sub_timer < 315 && sub_timer > 230) {
