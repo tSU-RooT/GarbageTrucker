@@ -368,7 +368,7 @@ window.onload = function() {
                 if (units[i].can_dispose >= 1) {
                     addPoint(units[i].can_dispose, units[i].color_id);
                     units[i].tl.removeFromScene();
-                    units.splice(i, 1);Ï
+                    units.splice(i, 1);
                     i--;
                     
                     continue;
@@ -713,7 +713,7 @@ window.onload = function() {
                         g_max = true;
                     }
 
-                    garbage_quantity = 0;
+                    
                     garbages = [];
                     for (var i=0;i<10;i++) {
                         garbages[i] = new Sprite(8, 8);
@@ -810,10 +810,11 @@ window.onload = function() {
                     }
                 } else if (sub_timer == 240 && !g_max)  {
                     if (game.difficult) {
-                        gamelimit_timer += 10 * garbage_quantity;
+                        gamelimit_timer += 8 * garbage_quantity;
                     } else {
-                        gamelimit_timer += 15 * garbage_quantity;
+                        gamelimit_timer += 10 * garbage_quantity;
                     }
+                    garbage_quantity = 0;
                     game.score += game_balance_tempo * 10;
                     game.popScene();
                 } else if ((sub_timer - 230) % 37 == 0 && g_max && sub_timer < 315 && sub_timer > 230) {
@@ -859,6 +860,7 @@ window.onload = function() {
                     }
                     game.star_id += 1;
                     game.score += game.star_id * 1000;
+                    garbage_quantity = 0;
                     game.popScene();
                     // 進行度に応じて処理
                     if (game.star_id == 4) {
@@ -990,7 +992,7 @@ window.onload = function() {
                             case 8:
                                 msg = "GAME ALL CLEAR!"
                         }
-                        game.end(game.score, msg);
+                        game.end(game.score, "Score:" + game.score + " " + msg);
                     }
                 }
                 sub_timer++;
