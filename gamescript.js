@@ -320,7 +320,7 @@ window.onload = function() {
             gametimer_sprites[i].tl.fadeIn(90);
             game.rootScene.addChild(gametimer_sprites[i]);
         }
-        var gamelimit_timer = 85;//98;
+        var gamelimit_timer = 75;//98;
         updateLimitTimer();
         // -----------------------------------------------------------------------
         // 初期化
@@ -575,7 +575,7 @@ window.onload = function() {
                 if (r.color_id == color_id) {
                     r.capacity += 2;
                     game.score += 1;
-                    if (r.capacity >= 5) {
+                    if (r.capacity >= 4) {
                         r.half = true;
                     }
                     if (r.capacity >= 8) {
@@ -614,7 +614,7 @@ window.onload = function() {
                         r.tl.fadeOut(5);
                         if (game.difficult && r.half)  {
                             sound_play(down_se);
-                            gamelimit_timer -= 10;
+                            gamelimit_timer -= 20;
                         }
                         r.half = false;
                     }
@@ -810,9 +810,9 @@ window.onload = function() {
                     }
                 } else if (sub_timer == 240 && !g_max)  {
                     if (game.difficult) {
-                        gamelimit_timer += 10 * garbage_quantity;
-                    } else {
                         gamelimit_timer += 5 * garbage_quantity;
+                    } else {
+                        gamelimit_timer += 7 * garbage_quantity;
                     }
                     garbage_quantity = 0;
                     game.score += game_balance_tempo * 10;
@@ -854,9 +854,9 @@ window.onload = function() {
                     // 加算処理
                     game.star_garbage = 0;
                     if (game.star_id >= 4) {
-                        gamelimit_timer += 45;
+                        gamelimit_timer += 30;
                     } else {
-                        gamelimit_timer += (25 + game.star_id * 10)
+                        gamelimit_timer += (20 + game.star_id * 10)
                     }
                     game.star_id += 1;
                     game.score += game.star_id * 1000;
@@ -920,7 +920,7 @@ window.onload = function() {
                     label2.opacity = 0;
                     game.currentScene.addChild(label2);
                 }
-                if (sub_timer >= 140 && (sub_timer - 140) % 25 == 0) {
+                if (sub_timer >= 140 && (sub_timer - 140) % 25 == 0 && !showed_star) {
                     if (s_index < game.star_id) {
                         var im = game.assets["img/"+STARS[s_index] + ".png"];
                         var sp = new Sprite(im.width, im.height);
