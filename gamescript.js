@@ -575,7 +575,7 @@ window.onload = function() {
                 if (r.color_id == color_id) {
                     r.capacity += 2;
                     game.score += 1;
-                    if (r.capacity >= 4) {
+                    if (r.capacity >= 3) {
                         r.half = true;
                     }
                     if (r.capacity >= 8) {
@@ -614,7 +614,7 @@ window.onload = function() {
                         r.tl.fadeOut(5);
                         if (game.difficult && r.half)  {
                             sound_play(down_se);
-                            gamelimit_timer -= 20;
+                            gamelimit_timer -= 10;
                         }
                         r.half = false;
                     }
@@ -854,7 +854,7 @@ window.onload = function() {
                     // 加算処理
                     game.star_garbage = 0;
                     if (game.star_id >= 4) {
-                        gamelimit_timer += 30;
+                        gamelimit_timer += 50;
                     } else {
                         gamelimit_timer += (20 + game.star_id * 8)
                     }
