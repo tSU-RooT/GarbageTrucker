@@ -810,9 +810,9 @@ window.onload = function() {
                     }
                 } else if (sub_timer == 240 && !g_max)  {
                     if (game.difficult) {
-                        gamelimit_timer += 8 * garbage_quantity;
-                    } else {
                         gamelimit_timer += 10 * garbage_quantity;
+                    } else {
+                        gamelimit_timer += 5 * garbage_quantity;
                     }
                     garbage_quantity = 0;
                     game.score += game_balance_tempo * 10;
@@ -854,9 +854,9 @@ window.onload = function() {
                     // 加算処理
                     game.star_garbage = 0;
                     if (game.star_id >= 4) {
-                        gamelimit_timer += 60;
+                        gamelimit_timer += 45;
                     } else {
-                        gamelimit_timer += (40 + game.star_id * 10)
+                        gamelimit_timer += (25 + game.star_id * 10)
                     }
                     game.star_id += 1;
                     game.score += game.star_id * 1000;
