@@ -854,7 +854,7 @@ window.onload = function() {
                     // 加算処理
                     game.star_garbage = 0;
                     if (game.star_id >= 4) {
-                        gamelimit_timer += 50;
+                        gamelimit_timer += 60;
                     } else {
                         gamelimit_timer += (20 + game.star_id * 8)
                     }
