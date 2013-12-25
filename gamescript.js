@@ -6,6 +6,7 @@ var UNIT_SPEED_ON_STAGE = 2;
 var ADD_TIMING = [11, 22, 34, 0];
 var STARS = ["Moon", "Mars", "Jupiter", "Saturn","Comet","Spiderβ", "AlphaCentauri","Syrius"];
 var USER_AGENT = window.navigator.userAgent.toLowerCase();
+// トップレベル変数    
 var USER_iOS = false;
 var _touched = false
 var soundon = true;
@@ -555,10 +556,7 @@ window.onload = function() {
 
                 }
             }
-            // ゲーム開始20秒目に モバイル用消音ボタンを消去する    
-            if (main_timer == game.fps * 20 && silentmark_sprite != null) {
-                silentmark_sprite.tl.fadeOut(15).removeFromScene();
-                
+            
             }
             // メインタイマーの加算
             main_timer += 1;
