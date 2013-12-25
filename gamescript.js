@@ -335,7 +335,7 @@ window.onload = function() {
         touch_sprite.addEventListener('touchend', function() {_touched = false;});
         game.rootScene.addChild(touch_sprite);
         var silentmark_sprite = null;
-        if (USER_AGENT.indexOf("android") > -1 || USER_AGENT.indexOf("iphone") > -1) {
+        if (USER_AGENT.indexOf("android") > -1 || USER_AGENT.indexOf("iphone") > -1|| USER_AGENT.indexOf("ipad") > -1) {
             silentmark_sprite = new Sprite(32, 32);
             silentmark_sprite.image = game.assets["img/silent.png"];
             silentmark_sprite.moveTo(125, 16);
@@ -346,6 +346,7 @@ window.onload = function() {
                     bgm.stop();
                 }
             });
+            enchant.Sound.enabledInMobileSafari = true;
             game.rootScene.addChild(silentmark_sprite);
         }
         // メイン処理使用変数の初期化
