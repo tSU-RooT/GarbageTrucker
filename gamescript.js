@@ -557,7 +557,7 @@ window.onload = function() {
                 }
             }
             
-            }
+            
             // メインタイマーの加算
             main_timer += 1;
         }
