@@ -107,13 +107,8 @@ function Unit_Sprite(color_id) {
         this.y -= this.height / 2;
     };
     this.canShift = function() {
-        // 第一引数が指定されている場合角度に補正をかけます。
-        var rev = 0;
-        if (arguments[0]) {
-            rev = arguments[0];
-        }
         if (!this.shift && this.timer > ((42 * 4) + 10 * 2) / game.unit_speed) {
-            var foo = (this.theta + rev - 45);
+            var foo = (this.theta - 45);
             if (foo < 0) {
                 foo += 360;
             }
@@ -253,7 +248,7 @@ window.onload = function() {
     var gameclear_se;
     function soundset() {
         if (USER_iOS) {
-            // iOSからのアクセスならロードをあらかじめキャンセルする。
+            // iOSからのアクセスならセットをキャンセルする。
             return;
         }
         bgm = game.assets["sounds/bgm.mp3"];
@@ -897,8 +892,9 @@ window.onload = function() {
         }
 
         function showScoreScene() {
-            //game.popScene();
-            bgm.stop();
+            if (bgm) {
+                bgm.stop();    
+            }
             game.pushScene(new Scene());
             var back_sprite = new Sprite(320, 320);
             var star_sprites = [];
