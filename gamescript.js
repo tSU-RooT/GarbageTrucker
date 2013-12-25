@@ -6,6 +6,14 @@ var UNIT_SPEED_ON_STAGE = 2;
 var ADD_TIMING = [11, 22, 34, 0];
 var STARS = ["Moon", "Mars", "Jupiter", "Saturn","Comet","Spiderβ", "AlphaCentauri","Syrius"];
 var USER_AGENT = window.navigator.userAgent.toLowerCase();
+var USER_iOS = false;
+var _touched = false
+var soundon = true;
+
+if (USER_AGENT.indexOf("iphone") > -1 || USER_AGENT.indexOf("ipad") > -1 || USER_AGENT.indexOf("ipod") > -1) {
+    USER_iOS = true;
+    soundon = false;
+}
 
 // クラス、関数の定義
 function Unit_Sprite(color_id) {
@@ -176,8 +184,7 @@ Rocket_Sprite.constructor = Rocket_Sprite;
 
 
 // クラス定義終わり
-var _touched = false
-var soundon = true;
+
 // もっとも外側に置く関数
 function pressSpaceKey() {
     return (game.input.a == 1) || _touched;
@@ -227,8 +234,10 @@ window.onload = function() {
     game.star_garbage = 0;
     game.unit_speed = UNIT_SPEED_ON_STAGE;
     game.difficult = false;
-    game.preload(['sounds/bgm.mp3', 'sounds/button09.mp3', 'sounds/fire01.wav', 'sounds/fire02.mp3', 'sounds/decide4.wav', 'sounds/beep11.wav',
+    if (!USER_iOS) {
+        game.preload(['sounds/bgm.mp3', 'sounds/button09.mp3', 'sounds/fire01.wav', 'sounds/fire02.mp3', 'sounds/decide4.wav', 'sounds/beep11.wav',
                   'sounds/cursor31.wav', 'sounds/crash10.wav', 'sounds/beep05.wav', 'sounds/pyoro58.wav', 'sounds/cancel5.wav', 'sounds/clear2.mp3']);
+    }
     var bgm;
     var plus_se;
     var fire_se;
@@ -242,6 +251,10 @@ window.onload = function() {
     var down_se;
     var gameclear_se;
     function soundset() {
+        if (USER_iOS) {
+            // iOSからのアクセスならロードをあらかじめキャンセルする。
+            return;
+        }
         bgm = game.assets["sounds/bgm.mp3"];
         plus_se = game.assets["sounds/button09.mp3"];
         fire_se = game.assets['sounds/fire01.wav'];
@@ -335,7 +348,7 @@ window.onload = function() {
         touch_sprite.addEventListener('touchend', function() {_touched = false;});
         game.rootScene.addChild(touch_sprite);
         var silentmark_sprite = null;
-        if (USER_AGENT.indexOf("android") > -1 || USER_AGENT.indexOf("iphone") > -1|| USER_AGENT.indexOf("ipad") > -1) {
+        if (USER_AGENT.indexOf("android") > -1) {
             silentmark_sprite = new Sprite(32, 32);
             silentmark_sprite.image = game.assets["img/silent.png"];
             silentmark_sprite.moveTo(125, 16);
@@ -346,7 +359,6 @@ window.onload = function() {
                     bgm.stop();
                 }
             });
-            enchant.Sound.enabledInMobileSafari = true;
             game.rootScene.addChild(silentmark_sprite);
         }
         // メイン処理使用変数の初期化
