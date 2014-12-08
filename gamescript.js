@@ -1,3 +1,27 @@
+/*
+The MIT License (MIT)
+
+Copyright (c) 2014 tSURooT <tsu.root@gmail.com>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
+
 "use strict";
 // おまじない
 enchant();
@@ -6,7 +30,7 @@ var UNIT_SPEED_ON_STAGE = 2;
 var ADD_TIMING = [11, 22, 34, 0];
 var STARS = ["Moon", "Mars", "Jupiter", "Saturn","Comet","Spiderβ", "AlphaCentauri","Syrius"];
 var USER_AGENT = window.navigator.userAgent.toLowerCase();
-// トップレベル変数    
+// トップレベル変数
 var USER_iOS = false;
 var _touched = false
 var soundon = true;
@@ -98,7 +122,7 @@ function Unit_Sprite(color_id) {
         } else if (this.theta > 360) {
             this.theta -= 360;
         }
-        this.setPolarToXY();    
+        this.setPolarToXY();
     };
     this.setPolarToXY = function() {
         this.x = 160 + Math.cos(this.theta * Math.PI / 180.0) * this.r;
@@ -126,7 +150,7 @@ Unit_Sprite.constructor = Unit_Sprite;
 function Rocket_Sprite(di_i, color_i) {
     /*
         プロパティ direction_idに関する仕様
-        左上から左回り(反時計周り)に1,2,3,4と振り分ける    
+        左上から左回り(反時計周り)に1,2,3,4と振り分ける
     */
     Sprite.apply(this, [36, 52]);
     this.capacity = 0;
@@ -166,7 +190,7 @@ function Rocket_Sprite(di_i, color_i) {
         }
 
         this.frame = (this.color_id - 1) * 10 + this.capacity;
-        
+
         if (this.color_id > 0) {
             this.opacity = 0.75;
         } else {
@@ -302,7 +326,7 @@ window.onload = function() {
         var stage_sprite = new Sprite(320, 320);
         stage_sprite.image = game.assets['img/stage.png'];
         stage_sprite.timer = 0;
-        
+
         stage_sprite.onenterframe = function() {
             if (pressSpaceKey() && this.timer < 6) {
                 this.timer += 1;
@@ -379,14 +403,14 @@ window.onload = function() {
                     units[i].tl.removeFromScene();
                     units.splice(i, 1);
                     i--;
-                    
+
                     continue;
                 }
                 units[i].update();
                 if (pressSpaceKey() && units[i].canShift()) {
                         units[i].shift = 1;
                 };
-                
+
             }
 
             // ----------------------------------------------------------------------------------------
@@ -399,10 +423,10 @@ window.onload = function() {
               22.5度動くたびに判定を行いたい
               speed = 2
               (度)    22, 44, 68, 90
-              (Flame) 11, 22, 34, 45 
+              (Flame) 11, 22, 34, 45
               speed = 3
               (度)    22, 45, 66, 90
-              (Flame) 7, 15, 22, 30 
+              (Flame) 7, 15, 22, 30
               1.5秒当たり4回の投入判定
               4分の1で投入するなら、1.5秒でひとつ入る
             */
@@ -425,9 +449,9 @@ window.onload = function() {
                 // まず投入可能方向を取得する。
                 var can_dir = getCanInsertDirection();
                 if (can_dir.length > 0) {
-                    
-                    
-                    
+
+
+
                     if (game_balance_tempo == 0) {
                         if (unit_count <= 12){
                             if (rand(5) == 0 && main_timer >= game.fps * 3.5) {
@@ -475,7 +499,7 @@ window.onload = function() {
                                 addUnit(can_dir[rand(can_dir.length)], RATIO[rand(RATIO.length)]);
                             }
                         }
-                        
+
                     } else if (game_balance_tempo >= 29 && game_balance_tempo <= 32) {
                         if (rand(5) <= 1) {
                             var RATIO = [1, 1, 1, 2, 2, 3, 3];
@@ -493,7 +517,7 @@ window.onload = function() {
                             addUnit(can_dir[rand(can_dir.length)], RATIO[rand(RATIO.length)]);
                         }
                     }
-                    // 38まで
+                    // 40まで
 
                 }
             }
@@ -522,21 +546,21 @@ window.onload = function() {
                     if (call_gamescore_scene == 0) {
                         showScoreScene();
                     }
-                
-            }   
+
+            }
             if (call_garbagescene > 0) {
                     call_garbagescene--;
                     if (call_garbagescene == 0 && call_gamescore_scene == 0) {
                         showGarbageScene(garbage_rocket_color_ids);
                     }
-                
+
             }
 
             //  中央タイマー処理
             if (main_timer % (game.fps) == 0 && call_gamescore_scene == 0) {
-                
+
                 gamelimit_timer--;
-                
+
                 updateLimitTimer();
             }
             if (bgm) {
@@ -551,13 +575,13 @@ window.onload = function() {
 
                 }
             }
-            
-            
+
+
             // メインタイマーの加算
             main_timer += 1;
         }
         game.rootScene.addEventListener('enterframe', each_frame_event);
-        
+
         function addUnit(dir, color_id) {
             var unit_sprite = new Unit_Sprite(color_id);
             unit_sprite.image = game.assets['img/units.png'];
@@ -566,7 +590,7 @@ window.onload = function() {
             unit_sprite.r = 240;
             unit_sprite.theta = 135 + 90 * (dir - 1);
             unit_sprite.setPolarToXY();
-            game.rootScene.addChild(unit_sprite); 
+            game.rootScene.addChild(unit_sprite);
             units.push(unit_sprite);
             unit_count++;
         }
@@ -625,7 +649,7 @@ window.onload = function() {
                         r.half = false;
                     }
                 }
-                
+
             }
 
         }
@@ -701,7 +725,7 @@ window.onload = function() {
                         label1.tl.delay(2).then(sound).delay(18).fadeOut(1).delay(8).fadeIn(1).loop();
                         game.currentScene.addChild(label1);
                     }
-                    
+
                 } else if (sub_timer == 158) {
                     label1.tl.unloop();
                     label1.tl.removeFromScene();
@@ -719,7 +743,7 @@ window.onload = function() {
                         g_max = true;
                     }
 
-                    
+
                     garbages = [];
                     for (var i=0;i<10;i++) {
                         garbages[i] = new Sprite(8, 8);
@@ -727,7 +751,7 @@ window.onload = function() {
                         garbages[i].opacity = 0;
                         game.currentScene.addChild(garbages[i]);
                     }
-                    
+
                     garbages[0].moveTo(160 - 7, 14 + 50);
                     garbages[1].moveTo(160 + 7, 20 + 50);
                     garbages[2].moveTo(160 - 16, 26 + 50);
@@ -739,7 +763,7 @@ window.onload = function() {
                     garbages[8].moveTo(160 + 8, 59 + 50);
                     garbages[9].moveTo(160 - 4, 57 + 50);
                     sound_play(garbage_se);
-                    
+
                     if (game.star_id > 0) {
                         switch(game.star_garbage) {
                             case 7:
@@ -768,7 +792,7 @@ window.onload = function() {
                             case 5:
 
                             case 4:
-                            
+
                             case 3:
                                 garbages[6].tl.fadeIn(20);
                                 garbages[8].tl.fadeIn(20);
@@ -795,7 +819,7 @@ window.onload = function() {
                         label2 = new Label();
                         label2.color = "#ffffff";
                         label2.font = "13px sans-serif";
-                        label2.text = "explode -star " + STARS[game.star_id];
+                        label2.text = "explode --star " + STARS[game.star_id];
                         label2.x = 60;
                         label2.y = 135 + 13;
                         game.currentScene.addChild(label1);
@@ -841,7 +865,7 @@ window.onload = function() {
                     sprite3.tl.delay(10).fadeOut(15);
                     // 爆発スプライト
                     explode = new Sprite(64, 64);
-                    explode.image = game.assets['img/explode.png'];                     
+                    explode.image = game.assets['img/explode.png'];
                     explode.moveTo(160 - 32, 50 + 10);
                     explode.scale(1.6, 1.6);
                     explode.opacity = 0.8;
@@ -884,7 +908,7 @@ window.onload = function() {
                           units[i].tl.delay(10).fadeOut(35);
                         }
                     }
-                    
+
                 }
 
                 sub_timer++;
@@ -893,7 +917,7 @@ window.onload = function() {
 
         function showScoreScene() {
             if (bgm) {
-                bgm.stop();    
+                bgm.stop();
             }
             game.pushScene(new Scene());
             var back_sprite = new Sprite(320, 320);
@@ -1079,6 +1103,8 @@ window.onload = function() {
             }
             return bar;
         }
+        // main_processの消去(ブラウザの仕様変更に伴う)
+        game.onload = undefined;
     };
     game.onload = game_main_process;
     game.start();
