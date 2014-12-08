@@ -1,4 +1,6 @@
 素材元についての明記
+ゲーム内の素材のいくつかは作者が著作権を保持していません。
+
 soundsフォルダ内 
  bgm.mp3 http://dova-s.jp/bgm/play786.html 村嶋 聡紀様 
 	この素材に関して 容量削減のため、mp3のビットレートを大幅に落とす加工をして利用させていただきました。
@@ -12,4 +14,5 @@ imgフォルダ内
  earth_.png [フリー画像素材] フォトレタッチ, 宇宙, 惑星, 地球 ID:201311220800
 	http://free-photos.gatag.net/2013/11/22/080000.html
 	ライセンス クリエイティブ・コモンズ 表示
+CC-BY http://creativecommons.org/licenses/by/4.0/
 	
