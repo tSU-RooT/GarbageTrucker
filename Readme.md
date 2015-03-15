@@ -15,6 +15,13 @@ Open "index.html" on Your Web Browser.
 ロケットが満杯になったら打ち上げだ！ そのうち投棄先の星も満杯になるから  
 そうなったら焼却処分だ！(星ごと)、てきぱきやらないと地球(数百年後)がゴミを処理しきれなくなってゲームオーバーさ。  
 
+# 動作環境
+Safari(Mac)  
+Safari(iOS) ※ 音は出ません  
+Chrome(Android)  
+# 動作しない環境
+Firefox  
+Chrome(PC) ※ 以前は動作したので原因調査中  
 
 # プログラムのライセンスについて
 gamescript.jsはtSU-RooTが作成しました。これはMIT Licenseで配布しています。  
@@ -30,5 +37,4 @@ https://github.com/wise9/enchant.js/
 imgフォルダ内のAlphaCentauri.png, Comet.png, Jupiter.png, Mars.png, Moon.png,Saturn.png, Spiderβ.png, Syrius.pngについては友人が作成してくれました。感謝を申し上げます。
 # About this Document
 
-この文章はtSU-RooT,<<tsu.root@gmail.com>> が作成しました、Creative Commons CC-BYです。
-http://creativecommons.org/licenses/by/4.0/
+この文章はtSU-RooT,<<tsu.root@gmail.com>> が作成しました。
