@@ -28,7 +28,7 @@ enchant();
 // 定数の定義
 var UNIT_SPEED_ON_STAGE = 2;
 var ADD_TIMING = [11, 22, 34, 0];
-var STARS = ["Moon", "Mars", "Jupiter", "Saturn","Comet","Spiderβ", "AlphaCentauri","Syrius"];
+var STARS = ["Moon", "Mars", "Jupiter", "Saturn","Comet","SpiderBeta", "AlphaCentauri","Syrius"];
 var USER_AGENT = window.navigator.userAgent.toLowerCase();
 // トップレベル変数
 var USER_iOS = false;
