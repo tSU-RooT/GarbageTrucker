@@ -19,9 +19,9 @@ Open "index.html" on Your Web Browser.
 Safari(Mac)  
 Safari(iOS) ※ 音は出ません  
 Chrome(Android)  
+Chrome(Mac, Ubuntu)
 # 動作しない環境
 Firefox  
-Chrome(PC) ※ 以前は動作したので原因調査中  
 
 # プログラムのライセンスについて
 gamescript.jsはtSU-RooTが作成しました。これはMIT Licenseで配布しています。  
